@@ -12,20 +12,26 @@
   --c-universal:#6a7570; --c-solar:#b8860b; --c-lunar:#5c7f9e; --c-abyssal:#6b5a7a; --c-dragon-blooded:#2c7356;
   --c-sidereal:#7a4fa0; --c-infernal:#4f8a2a; --c-alchemical:#6f7b86; --c-getimian:#2a8a8a; --c-liminal:#a2453a;
   --c-exigent-janest:#a07a2a; --c-martial-arts:#8a5a3a; --c-sorcery:#3a5aa0; --c-quality:#5b6862;
+  --c-exigent:#8f6a1f; --c-architect:#7a6a4a; --c-sovereign:#9a3f6e; --c-dragon-king:#4a7a2a; --c-dream-souled:#8a4fa8; --c-umbral:#3d3d58; --c-antagonist:#a0442c;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#121614; --surface:#1a201d; --sunk:#232b27; --line:#33403a; --fg:#e6e9e3; --muted:#9aa8a1;
   --accent:#e2ad48; --accent-ink:#1d1606; --jade:#5fbf94; --warn:#e08a72;
   --c-universal:#9aa6a0; --c-solar:#e2ad48; --c-lunar:#94b6d4; --c-abyssal:#b5a2c6; --c-dragon-blooded:#5fbf94;
   --c-sidereal:#bf98e0; --c-infernal:#8fcf62; --c-alchemical:#a9b5c0; --c-getimian:#5fcaca; --c-liminal:#e08a7e;
-  --c-exigent-janest:#d8b467; --c-martial-arts:#d39b78; --c-sorcery:#8fa8e6; --c-quality:#9aa8a1; color-scheme:dark}}
+  --c-exigent-janest:#d8b467; --c-martial-arts:#d39b78; --c-sorcery:#8fa8e6; --c-quality:#9aa8a1;
+  --c-exigent:#d1aa5c; --c-architect:#c8b48a; --c-sovereign:#e08ab6; --c-dragon-king:#9ccf6a; --c-dream-souled:#c9a0e6; --c-umbral:#a4a4d6; --c-antagonist:#e8947a; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#121614; --surface:#1a201d; --sunk:#232b27; --line:#33403a; --fg:#e6e9e3; --muted:#9aa8a1;
   --accent:#e2ad48; --accent-ink:#1d1606; --jade:#5fbf94; --warn:#e08a72;
   --c-universal:#9aa6a0; --c-solar:#e2ad48; --c-lunar:#94b6d4; --c-abyssal:#b5a2c6; --c-dragon-blooded:#5fbf94;
   --c-sidereal:#bf98e0; --c-infernal:#8fcf62; --c-alchemical:#a9b5c0; --c-getimian:#5fcaca; --c-liminal:#e08a7e;
-  --c-exigent-janest:#d8b467; --c-martial-arts:#d39b78; --c-sorcery:#8fa8e6; --c-quality:#9aa8a1; color-scheme:dark}
+  --c-exigent-janest:#d8b467; --c-martial-arts:#d39b78; --c-sorcery:#8fa8e6; --c-quality:#9aa8a1;
+  --c-exigent:#d1aa5c; --c-architect:#c8b48a; --c-sovereign:#e08ab6; --c-dragon-king:#9ccf6a; --c-dream-souled:#c9a0e6; --c-umbral:#a4a4d6; --c-antagonist:#e8947a; color-scheme:dark}
 *{box-sizing:border-box}
+.bk{font:600 11px/1 var(--mono);padding:2px 5px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.bk.poc{color:var(--c-antagonist);border-color:var(--c-antagonist)}
+.blk summary{cursor:pointer}.blk td:first-child{min-width:260px}.blk .small{max-width:420px}
 body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--body);margin:0}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -171,19 +177,20 @@ body[data-dock="top"] .dock[data-min="1"] .dock-b,body[data-dock="bottom"] .dock
 <script>
 const D=JSON.parse(document.getElementById('data').textContent);
 const T=D.templates;
-const SRC_LABEL={universal:'Universal',solar:'Solar',lunar:'Lunar',abyssal:'Abyssal','dragon-blooded':'Dragon-Blooded',sidereal:'Sidereal',infernal:'Infernal',alchemical:'Alchemical',getimian:'Getimian',liminal:'Liminal','exigent-janest':'Exigent (Janest)','martial-arts':'Martial Arts',sorcery:'Sorcery',necromancy:'Necromancy'};
-const EXALTS=['solar','lunar','abyssal','dragon-blooded','sidereal','infernal','alchemical','getimian','liminal','exigent-janest'];
-const CREATURES=['mortal',...EXALTS,'god','demon','elemental','undead','fae','behemoth','animal','other'];
-const CRE_LABEL={en:{mortal:'Mortal',god:'God',demon:'Demon',elemental:'Elemental',undead:'Undead / ghost',fae:'Fair Folk',behemoth:'Behemoth',animal:'Animal',other:'Other'},pt:{mortal:'Mortal',god:'Deus',demon:'Demônio',elemental:'Elemental',undead:'Morto-vivo / fantasma',fae:'Fair Folk',behemoth:'Behemoth',animal:'Animal',other:'Outro'}};
+const SRC_LABEL={universal:'Universal',solar:'Solar',lunar:'Lunar',abyssal:'Abyssal','dragon-blooded':'Dragon-Blooded',sidereal:'Sidereal',infernal:'Infernal',alchemical:'Alchemical',getimian:'Getimian',liminal:'Liminal','exigent-janest':'Exigent (Janest)','martial-arts':'Martial Arts',sorcery:'Sorcery',necromancy:'Necromancy',exigent:'Exigent',architect:'Architect',sovereign:'Sovereign (Uluiru)','dragon-king':'Dragon King','dream-souled':'Dream-Souled',umbral:'Umbral',antagonist:'Antagonist'};
+const BOOK={core:'Core',poc:'Pillars of Creation'};
+const EXALTS=['solar','lunar','abyssal','dragon-blooded','sidereal','infernal','alchemical','getimian','liminal','exigent-janest','exigent','architect','sovereign','dragon-king','dream-souled','umbral'];
+const CREATURES=['mortal',...EXALTS,'god','demon','elemental','undead','fae','behemoth','animal','construct','magiccreature','exalt','other'];
+const CRE_LABEL={en:{mortal:'Mortal',god:'God',demon:'Demon',elemental:'Elemental',undead:'Undead / ghost',fae:'Fair Folk',behemoth:'Behemoth',animal:'Animal',construct:'Construct',magiccreature:'Magical creature',exalt:'Exalt (other)',other:'Other'},pt:{mortal:'Mortal',god:'Deus',demon:'Demônio',elemental:'Elemental',undead:'Morto-vivo / fantasma',fae:'Fair Folk',behemoth:'Behemoth',animal:'Animal',construct:'Constructo',magiccreature:'Criatura mágica',exalt:'Exaltado (outro)',other:'Outro'}};
 const I18N={
  en:{sub:'Exalted: Essence',templates:'Templates',library:'Library',builder:'Enemies',
   tplTitle:'Stat templates by Circle Essence',tplLede:'Pick the Essence of the players’ Circle. Each row is a starting point for an antagonist of that tier; tune any value by up to ±3.',
   pc:'Your Circle at this Essence',motes:'Motes',hardness:'Hardness',health:'Health',soak:'Soak',defense:'Defense',resolve:'Resolve',essence:'Essence',pools:'Pools (P/S/T)',charms:'Charms',qualities:'Qualities',weapon:'Weapon (acc/dmg/ovw)',use:'Use on active enemy',
   bg:'Battle groups',bgSize:'Size',fighters:'Fighters',ovw:'Overwhelming',drill:'Drill',bonus:'Bonus',freeQ:'Free quality',rout:'Rout check when',official:'Official stat blocks',type:'Type',page:'p.',rules:'Rules behind these numbers',
-  libTitle:'Charms, spells and qualities',libLede:'Every Charm, martial art, spell and antagonist quality in the core book, distilled to what an antagonist needs. Pick an Exalt type to see its Charms plus universal Charms, martial arts and spells, with that type’s modes highlighted.',
+  book:'Book',allBooks:'All books',usedBy:'Used by',useBlock:'New enemy from this block',accDmgDef:'acc/dmg/def',libTitle:'Charms, spells and qualities',libLede:'Every Charm, martial art, spell and antagonist quality in the core book and Pillars of Creation (plus its antagonists’ unique Charms), distilled to what an antagonist needs. Pick an Exalt type to see its Charms plus universal Charms, martial arts and spells, with that type’s modes highlighted.',
   search:'Search',source:'Exalt type / source',all:'All',cat:'Kind',maxEss:'Max Essence',tag:'Focus',any:'Any',results:'results',modes:'modes',add:'Add',added:'Added to',
-  kinds:{charm:'Charm','martial-art':'Martial art',spell:'Spell','shaping-ritual':'Shaping ritual',quality:'Quality'},
-  tags:{offense:'Offense',defense:'Defense',social:'Social',movement:'Movement',power:'Power',healing:'Healing',venture:'Ventures','mass-combat':'Mass combat',stealth:'Stealth',supernatural:'Supernatural'},
+  kinds:{charm:'Charm','martial-art':'Martial art',spell:'Spell','shaping-ritual':'Shaping ritual',antagonist:'Antagonist charm',quality:'Quality'},
+  tags:{offense:'Offense',defense:'Defense',social:'Social',movement:'Movement',power:'Power',healing:'Healing',venture:'Ventures','mass-combat':'Mass combat',stealth:'Stealth',supernatural:'Supernatural',eclipse:'Eclipse OK','sidereal-style':'Sidereal style'},
   qtypes:{general:'General',exalted:'Exalted',social:'Social',spirit:'Spirit',outnumber:'Outnumber',supernatural:'Supernatural',animal:'Animal'},
   bTitle:'Enemy sheet',name:'Name',concept:'Concept',creature:'Creature type',prim:'Primary',sec:'Secondary',ter:'Tertiary',actions:'actions (comma separated)',notes:'Notes',
   picked:'Charms & qualities',none:'Nothing added yet. Use Add in the Library.',unnamed:'Unnamed enemy',
@@ -200,10 +207,10 @@ const I18N={
   tplTitle:'Templates de stats por Essence do Círculo',tplLede:'Escolha a Essence do Círculo dos jogadores. Cada linha é um ponto de partida para um antagonista daquele nível; ajuste qualquer valor em até ±3.',
   pc:'Seu Círculo nesta Essence',motes:'Motes',hardness:'Hardness',health:'Health',soak:'Soak',defense:'Defense',resolve:'Resolve',essence:'Essence',pools:'Pools (P/S/T)',charms:'Charms',qualities:'Qualidades',weapon:'Arma (acerto/dano/ovw)',use:'Aplicar no inimigo ativo',
   bg:'Grupos de batalha',bgSize:'Size',fighters:'Combatentes',ovw:'Overwhelming',drill:'Drill',bonus:'Bônus',freeQ:'Qualidade grátis',rout:'Teste de debandada quando',official:'Blocos oficiais',type:'Tipo',page:'p.',rules:'Regras por trás destes números',
-  libTitle:'Charms, feitiços e qualidades',libLede:'Todos os Charms, artes marciais, feitiços e qualidades de antagonista do livro básico, destilados no que um antagonista precisa. Escolha um tipo de Exaltado para ver os Charms dele mais os universais, artes marciais e feitiços, com os modos desse tipo destacados.',
+  book:'Livro',allBooks:'Todos os livros',usedBy:'Usado por',useBlock:'Novo inimigo a partir deste bloco',accDmgDef:'acerto/dano/def',libTitle:'Charms, feitiços e qualidades',libLede:'Todos os Charms, artes marciais, feitiços e qualidades de antagonista do livro básico e de Pillars of Creation (mais os Charms únicos dos antagonistas), destilados no que um antagonista precisa. Escolha um tipo de Exaltado para ver os Charms dele mais os universais, artes marciais e feitiços, com os modos desse tipo destacados.',
   search:'Buscar',source:'Tipo de Exaltado / fonte',all:'Todos',cat:'Tipo',maxEss:'Essence máx.',tag:'Foco',any:'Qualquer',results:'resultados',modes:'modos',add:'Adicionar',added:'Adicionado a',
-  kinds:{charm:'Charm','martial-art':'Arte marcial',spell:'Feitiço','shaping-ritual':'Ritual de moldagem',quality:'Qualidade'},
-  tags:{offense:'Ofensiva',defense:'Defesa',social:'Social',movement:'Movimento',power:'Power',healing:'Cura',venture:'Projetos','mass-combat':'Combate em massa',stealth:'Furtividade',supernatural:'Sobrenatural'},
+  kinds:{charm:'Charm','martial-art':'Arte marcial',spell:'Feitiço','shaping-ritual':'Ritual de moldagem',antagonist:'Charm de antagonista',quality:'Qualidade'},
+  tags:{offense:'Ofensiva',defense:'Defesa',social:'Social',movement:'Movimento',power:'Power',healing:'Cura',venture:'Projetos','mass-combat':'Combate em massa',stealth:'Furtividade',supernatural:'Sobrenatural',eclipse:'Eclipse OK','sidereal-style':'Estilo Sidereal'},
   qtypes:{general:'Gerais',exalted:'Exaltados',social:'Sociais',spirit:'Espíritos',outnumber:'Outnumber',supernatural:'Sobrenaturais',animal:'Animais'},
   bTitle:'Ficha do inimigo',name:'Nome',concept:'Conceito',creature:'Tipo de criatura',prim:'Primária',sec:'Secundária',ter:'Terciária',actions:'ações (separadas por vírgula)',notes:'Notas',
   picked:'Charms e qualidades',none:'Nada adicionado ainda. Use Adicionar na Biblioteca.',unnamed:'Inimigo sem nome',
@@ -220,7 +227,7 @@ const I18N={
 const store={get(k,d){try{const v=localStorage.getItem('eaf.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('eaf.'+k,JSON.stringify(v))}catch(e){}}};
 let L=store.get('lang','en'), TAB=store.get('tab','templates'), PE=store.get('pe',1);
 let DOCK=store.get('dock','right'), DMIN=store.get('dmin',false);
-let F=Object.assign({q:'',src:'all',cat:'all',ess:'5',tag:'all'},store.get('filters',{}));
+let F=Object.assign({q:'',src:'all',cat:'all',ess:'5',tag:'all',book:'all'},store.get('filters',{}));
 const t=k=>I18N[L][k]??k;
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const sv=v=>Array.isArray(v)?v.join('–'):v;
@@ -242,9 +249,9 @@ const ename=e=>e.name||t('unnamed');
 
 /* ---------- Foundry export (Exalted Essence system 2.0.11) ---------- */
 const LIB=new Map([...D.charms,...D.qualities].map(x=>[x.id,x]));
-const FX={'dragon-blooded':'dragonblooded','exigent-janest':'exigent'};
-const FCHARM={'dragon-blooded':'dragonblooded','exigent-janest':'janest','martial-arts':'martialarts',universal:'other',sorcery:'other'};
-const FCRE={mortal:'mortal',god:'god',demon:'demon',elemental:'elemental',undead:'undead',fae:'fae',behemoth:'behemoth',animal:'animal',other:'other'};
+const FX={'dragon-blooded':'dragonblooded','exigent-janest':'exigent',exigent:'exigent',architect:'exigent',sovereign:'exigent','dragon-king':'dragonking','dream-souled':'dreamsouled',umbral:'umbral'};
+const FCHARM={'dragon-blooded':'dragonblooded','exigent-janest':'janest','martial-arts':'martialarts',universal:'other',sorcery:'other',exigent:'other',architect:'architect',sovereign:'sovereign','dragon-king':'dragonking','dream-souled':'dreamsouled',umbral:'umbral',antagonist:'other'};
+const FCRE={mortal:'mortal',god:'god',demon:'demon',elemental:'elemental',undead:'undead',fae:'fae',behemoth:'behemoth',animal:'animal',construct:'construct',magiccreature:'magiccreature',exalt:'exalt',other:'other'};
 function fAbility(s){s=(s||'').toLowerCase();for(const k of['close','ranged','physique','sagacity','athletics','awareness','craft','embassy','integrity','navigate','performance','presence','stealth','war','finesse','force','fortitude'])if(s.startsWith(k))return k;return 'other'}
 function fCost(c){c=c||'';const o={motes:0,committed:0,anima:0,health:0,healthtype:'bashing',stunt:0,power:0};let m;
   if(m=c.match(/(commit )?(\d+)m/))o[m[1]?'committed':'motes']=+m[2];if(m=c.match(/(\d+)a\b/))o.anima=+m[1];if(m=c.match(/(\d+) HL/))o.health=+m[1];
@@ -279,7 +286,7 @@ function toFoundry(e){
     health:{value:+e.health||1,min:0,max:+e.health||1,levels:+e.health||1,lethal:0,aggravated:0,penalty:0},
     pools:{primary:{value:+e.pools.primary.dice||0,actions:e.pools.primary.actions},secondary:{value:+e.pools.secondary.dice||0,actions:e.pools.secondary.actions},tertiary:{value:+e.pools.tertiary.dice||0,actions:e.pools.tertiary.actions}},
     qualities:e.qualities.map(q=>q.name).join(', '),
-    biography:`<p>${esc(e.concept)}</p>${e.notes?`<p>${esc(e.notes).replace(/\n/g,'<br>')}</p>`:''}<p><em>Essence Antagonist Forge · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier]?.[L]||'')}</em></p>`
+    biography:`<p>${esc(e.concept)}</p>${e.notes?`<p>${esc(e.notes).replace(/\n/g,'<br>')}</p>`:''}<p><em>Essence Antagonist Forge${T.tiers[e.tier]?` · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier][L])}`:''}</em></p>`
   };
   return {name:ename(e),type:'npc',img:'icons/svg/mystery-man.svg',system:sys,items,effects:[],flags:{'essence-antagonist-forge':{sourceId:e.id}},
     _stats:{systemId:'exaltedessence',systemVersion:'2.0.11',coreVersion:'13.345'}};
@@ -325,7 +332,7 @@ function renderDock(){
     <button class="ib" type="button" id="dock-min" aria-label="${DMIN?t('expand'):t('minimize')}" title="${DMIN?t('expand'):t('minimize')}">${DMIN?'▢':'–'}</button>
   </div>
   <div class="dock-b"><div>
-    <h3>${esc(ename(e))}</h3><div class="small">${esc(creLabel(e.creature))} · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier]?.[L]||'')}</div>
+    <h3>${esc(ename(e))}</h3><div class="small">${esc(creLabel(e.creature))}${T.tiers[e.tier]?` · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier][L])}`:''}</div>
     ${e.concept?`<div class="small">${esc(e.concept)}</div>`:''}
     ${statline(e)}${pools}${e.weapon?`<div class="small"><b>${t('weapon')}:</b> ${esc(e.weapon)}</div>`:''}
     <div class="dock-actions"><button class="btn" type="button" data-go="builder">${t('edit')}</button><button class="btn primary" type="button" data-fx="macro">${t('foundryMacro')}</button><button class="btn" type="button" data-fx="json">${t('foundryJson')}</button></div>
@@ -373,12 +380,22 @@ function renderTemplates(){
     ${T.battleGroups.drill.map(d=>`<tr><td>${d.drill}</td><td class="num">+${d.bonus}</td><td>${d.quality}</td><td class="small">${esc(d.rout[L])}</td></tr>`).join('')}</tbody></table></div>
     <p class="note">${esc(T.battleGroups.notes[L])}</p></div>
   </div>
-  <div class="panel scroll" style="margin-top:16px"><h3 style="margin-bottom:8px">${t('official')}</h3><table><thead><tr><th>${t('name')}</th><th>${t('type')}</th><th>${t('essence')}</th><th>${t('pools')}</th><th>${t('health')}</th><th>${t('defense')}</th><th>${t('soak')}</th><th>${t('hardness')}</th><th>${t('resolve')}</th><th>${t('page')}</th></tr></thead><tbody>
-  ${T.officialBlocks.map(b=>`<tr><td>${esc(b.name)}</td><td class="small">${esc(b.type)}</td><td class="num">${b.essence||'—'}</td><td class="num">${b.pools.join('/')}</td><td class="num">${b.health}</td><td class="num">${b.defense}</td><td class="num">${b.soak}</td><td class="num">${b.hardness}</td><td class="num">${b.resolve}</td><td class="num">${b.page}</td></tr>`).join('')}
+  <div class="panel scroll" style="margin-top:16px"><h3 style="margin-bottom:8px">${t('official')}</h3><table><thead><tr><th>${t('name')}</th><th>${t('type')}</th><th>${t('essence')}</th><th>${t('pools')}</th><th>${t('health')}</th><th>${t('defense')}</th><th>${t('soak')}</th><th>${t('hardness')}</th><th>${t('resolve')}</th><th>${t('book')}</th><th>${t('page')}</th><th></th></tr></thead><tbody>
+  ${T.officialBlocks.map((b,i)=>`<tr class="blk"><td>${b.qualities?`<details><summary>${esc(b.name)}</summary><div class="small">${b.section?`<i>${esc(b.section)}</i><br>`:''}${b.qualities.length?`<b>${t('qualities')}:</b> ${esc(b.qualities.join(', '))}<br>`:''}${b.charmIds&&b.charmIds.length?`<b>${t('charms')}:</b> ${esc(b.charmIds.map(id=>(LIB.get(id)||{}).name).join(', '))}<br>`:''}${b.weapon?`<b>${t('weapon').split(' (')[0]} (${t('accDmgDef')}):</b> ${esc(b.weapon)}<br>`:''}${b.note?esc(b.note[L]):''}</div></details>`:esc(b.name)}</td><td class="small">${esc(creLabel(b.type))}</td><td class="num">${b.essence||'—'}${b.motes?` <span class="small">(${b.motes}m)</span>`:''}</td><td class="num">${b.pools.join('/')}</td><td class="num">${b.health}</td><td class="num">${b.defense}</td><td class="num">${b.soak}</td><td class="num">${b.hardness}</td><td class="num">${b.resolve}</td><td><span class="bk ${b.book||'core'}">${b.book==='poc'?'PoC':'Core'}</span></td><td class="num">${b.page}</td><td><button class="btn" type="button" data-block="${i}" title="${t('useBlock')}" aria-label="${t('useBlock')}: ${esc(b.name)}">+</button></td></tr>`).join('')}
   </tbody></table></div>`;
 }
 document.getElementById('view-templates').addEventListener('click',ev=>{
   const pe=ev.target.closest('[data-pe]'); if(pe){PE=+pe.dataset.pe;store.set('pe',PE);renderTemplates();return}
+  const bl=ev.target.closest('[data-block]'); if(bl){const b=T.officialBlocks[+bl.dataset.block],en=Math.max(1,+b.essence||1);
+    const ty=/dragon/i.test(b.note?.en||'')&&b.type==='exalt'?'dragon-blooded':b.type, n=blank();
+    const wm=(b.weapon||'').match(/^([^(;]*?)\s*\(([+-]\d+)\/([+-]\d+)\/[+-]?\d+, Ovw(\d+)/);
+    Object.assign(n,{tier:'official',name:b.name,concept:(b.section||'')+' · '+BOOK[b.book||'core']+' p. '+b.page,creature:CREATURES.includes(ty)?ty:'other',essence:en,
+      motes:b.motes||Math.min(15,en*2+Math.floor((en-1)/2)+3),health:b.health,defense:b.defense,soak:b.soak,hardness:b.hardness,resolve:b.resolve,
+      weapon:wm?`${wm[1].trim()} ${wm[2]}/${wm[3]}/${wm[4]}`:'',notes:[b.weapon,b.note&&b.note[L]].filter(Boolean).join('\n')});
+    n.pools.primary.dice=b.pools[0];n.pools.secondary.dice=b.pools[1];n.pools.tertiary.dice=b.pools[2];
+    (b.qualityIds||[]).forEach(id=>{const q=D.qualities.find(x=>x.id===id);if(q&&!n.qualities.some(x=>x.id===id))n.qualities.push(pickQ(q))});
+    (b.charmIds||[]).forEach(id=>{const c=LIB.get(id);if(c)n.charms.push(pickC(c))});
+    ROSTER.push(n);ACTIVE=n.id;save();renderAll();toast(t('added')+' '+ename(n));return}
   const u=ev.target.closest('[data-use]'); if(u){const k=u.dataset.use,r=T.byEssence[PE][k],e=E();
     Object.assign(e,{playerEssence:PE,tier:k,essence:r.essence||1,motes:r.motes,health:r.health,defense:r.defense,soak:r.soak,hardness:r.hardness,resolve:r.resolve,weapon:r.weapon});
     e.pools.primary.dice=r.pools[0];e.pools.secondary.dice=r.pools[1];e.pools.tertiary.dice=r.pools[2];
@@ -391,6 +408,7 @@ const ALL=[...D.charms,...D.qualities];
 function filtered(){
   const q=F.q.trim().toLowerCase(), me=+F.ess;
   return ALL.filter(x=>{
+    if(F.book!=='all'&&(x.book||'core')!==F.book)return false;
     if(F.cat!=='all'&&x.category!==F.cat)return false;
     if(F.src!=='all'){
       if(F.src==='quality'){if(x.category!=='quality')return false}
@@ -398,7 +416,7 @@ function filtered(){
       else if(x.source!==F.src)return false}
     if(x.minEssence&&x.minEssence>me)return false;
     if(F.tag!=='all'&&!(x.tags||[]).includes(F.tag))return false;
-    if(q){const hay=(x.name+' '+(x.ability||'')+' '+(x.style||'')+' '+x.summary.en+' '+x.summary.pt+' '+(x.modes||[]).map(m=>m.name).join(' ')).toLowerCase();if(!hay.includes(q))return false}
+    if(q){const hay=(x.name+' '+(x.ability||'')+' '+(x.style||'')+' '+x.summary.en+' '+x.summary.pt+' '+(x.modes||[]).map(m=>m.name).join(' ')+' '+(x.antagonists||[]).join(' ')).toLowerCase();if(!hay.includes(q))return false}
     return true});
 }
 const hlType=()=>EXALTS.includes(F.src)?F.src:(EXALTS.includes(E().creature)?E().creature:null);
@@ -410,10 +428,10 @@ function itemHTML(x){
   const sorted=hl?[...ms].sort((a,b)=>(b.exalts.includes(hl))-(a.exalts.includes(hl))):ms;
   const has=E().charms.some(c=>c.id===x.id)||E().qualities.some(c=>c.id===x.id);
   return `<article class="item" style="--src:var(--c-${src})">
-   <div><h3>${esc(x.name)}</h3><div class="meta"><span class="chip">${esc(x.category==='quality'?kind:SRC_LABEL[x.source])}</span><span>${esc(sub)}</span>${x.cost?`<span>${t('cost')} ${esc(x.cost)}</span>`:''}${x.step?`<span>${t('step')} ${esc(x.step)}</span>`:''}${x.minEssence>1?`<span>Ess ${x.minEssence}+</span>`:''}${x.prerequisites?`<span title="${esc(x.prerequisites)}">${esc(x.prerequisites.length>40?x.prerequisites.slice(0,40)+'…':x.prerequisites)}</span>`:''}<span>${t('page')} ${x.page}</span></div></div>
+   <div><h3>${esc(x.name)}</h3><div class="meta"><span class="chip">${esc(x.category==='quality'?kind:SRC_LABEL[x.source])}</span><span>${esc(sub)}</span>${x.cost?`<span>${t('cost')} ${esc(x.cost)}</span>`:''}${x.step?`<span>${t('step')} ${esc(x.step)}</span>`:''}${x.minEssence>1?`<span>Ess ${x.minEssence}+</span>`:''}${x.prerequisites?`<span title="${esc(x.prerequisites)}">${esc(x.prerequisites.length>40?x.prerequisites.slice(0,40)+'…':x.prerequisites)}</span>`:''}<span>${t('page')} ${x.page}</span><span class="bk ${x.book||'core'}" title="${esc(BOOK[x.book||'core'])}">${x.book==='poc'?'PoC':'Core'}</span></div>${x.antagonists?`<div class="small">${t('usedBy')}: ${esc(x.antagonists.join(', '))}</div>`:''}</div>
    <div><button class="btn" type="button" data-add="${x.id}" ${has?'disabled':''}>${has?'✓':'+ '+t('add')}</button></div>
    <p class="sum">${esc(x.summary[L])}</p>
-   ${ms.length?`<details ${hl&&ms.some(m=>m.exalts.includes(hl))?'open':''}><summary>${ms.length} ${t('modes')}</summary><ul class="modes">${sorted.map(m=>`<li class="${hl&&m.exalts.includes(hl)?'hl':''}"><b>${esc(m.name)}</b> <span class="small">(${m.exalts.map(e=>SRC_LABEL[e]).join(', ')})</span> — ${esc(m.summary[L])}</li>`).join('')}</ul></details>`:''}
+   ${ms.length?`<details ${hl&&ms.some(m=>m.exalts.includes(hl))?'open':''}><summary>${ms.length} ${t('modes')}</summary><ul class="modes">${sorted.map(m=>`<li class="${hl&&m.exalts.includes(hl)?'hl':''}"><b>${esc(m.name)}</b> <span class="small">(${m.exalts.map(e=>SRC_LABEL[e]).join(', ')})</span> ${m.book==='poc'?` <span class="bk poc">PoC p. ${m.page}</span>`:''} — ${esc(m.summary[L])}</li>`).join('')}</ul></details>`:''}
   </article>`;
 }
 let LIMIT=60;
@@ -424,7 +442,8 @@ function renderLibrary(){
   const opt=(v,l,cur)=>`<option value="${v}" ${cur==v?'selected':''}>${esc(l)}</option>`;
   document.getElementById('filters').innerHTML=`
    <label for="f-q">${t('search')}<input type="search" id="f-q" value="${esc(F.q)}"></label>
-   <label for="f-src">${t('source')}<select id="f-src">${opt('all',t('all'),F.src)}${EXALTS.map(e=>opt(e,SRC_LABEL[e]+(L==='pt'?' + universais, MA, feitiços':' + universal, MA, spells'),F.src)).join('')}${opt('universal','Universal',F.src)}${opt('martial-arts','Martial Arts',F.src)}${opt('sorcery',L==='pt'?'Feitiçaria / Necromancia':'Sorcery / Necromancy',F.src)}${opt('quality',I18N[L].kinds.quality,F.src)}</select></label>
+   <label for="f-src">${t('source')}<select id="f-src">${opt('all',t('all'),F.src)}${EXALTS.map(e=>opt(e,SRC_LABEL[e]+(L==='pt'?' + universais, MA, feitiços':' + universal, MA, spells'),F.src)).join('')}${opt('universal','Universal',F.src)}${opt('martial-arts','Martial Arts',F.src)}${opt('sorcery',L==='pt'?'Feitiçaria / Necromancia':'Sorcery / Necromancy',F.src)}${opt('antagonist',I18N[L].kinds.antagonist,F.src)}${opt('quality',I18N[L].kinds.quality,F.src)}</select></label>
+   <label for="f-book">${t('book')}<select id="f-book">${opt('all',t('allBooks'),F.book)}${Object.entries(BOOK).map(([k,l])=>opt(k,l,F.book)).join('')}</select></label>
    <label for="f-cat">${t('cat')}<select id="f-cat">${opt('all',t('all'),F.cat)}${Object.entries(I18N[L].kinds).map(([k,l])=>opt(k,l,F.cat)).join('')}</select></label>
    <label for="f-ess">${t('maxEss')}<select id="f-ess">${[1,2,3,4,5].map(n=>opt(n,n,F.ess)).join('')}</select></label>
    <label for="f-tag">${t('tag')}<select id="f-tag">${opt('all',t('any'),F.tag)}${Object.entries(I18N[L].tags).map(([k,l])=>opt(k,l,F.tag)).join('')}</select></label>
@@ -442,7 +461,7 @@ const pickC=c=>{const hl=hlType();const md=hl&&(c.modes||[]).find(m=>m.exalts.in
   return {id:c.id,name:c.name,source:c.source,category:c.category,cost:c.cost||null,step:c.step||null,page:c.page,summary:c.summary,mode:md?{name:md.name,summary:md.summary}:null}};
 const vl=document.getElementById('view-library');
 vl.addEventListener('input',ev=>{if(ev.target.id==='f-q'){F.q=ev.target.value;LIMIT=60;store.set('filters',F);renderList()}});
-vl.addEventListener('change',ev=>{const m={'f-src':'src','f-cat':'cat','f-ess':'ess','f-tag':'tag'}[ev.target.id];if(!m)return;F[m]=ev.target.value;LIMIT=60;store.set('filters',F);renderList()});
+vl.addEventListener('change',ev=>{const m={'f-src':'src','f-cat':'cat','f-ess':'ess','f-tag':'tag','f-book':'book'}[ev.target.id];if(!m)return;F[m]=ev.target.value;LIMIT=60;store.set('filters',F);renderList()});
 vl.addEventListener('click',ev=>{
   if(ev.target.id==='more'){LIMIT+=60;renderList();return}
   const a=ev.target.closest('[data-add]');
