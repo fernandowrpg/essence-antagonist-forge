@@ -227,7 +227,7 @@ const I18N={
 const store={get(k,d){try{const v=localStorage.getItem('eaf.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('eaf.'+k,JSON.stringify(v))}catch(e){}}};
 let L=store.get('lang','en'), TAB=store.get('tab','templates'), PE=store.get('pe',1);
 let DOCK=store.get('dock','right'), DMIN=store.get('dmin',false);
-let F=Object.assign({q:'',src:'all',cat:'all',ess:'5',tag:'all',book:'all'},store.get('filters',{}));
+let F=Object.assign({q:'',src:'all',cat:'all',ess:'10',tag:'all',book:'all'},store.get('filters',{}));
 const t=k=>I18N[L][k]??k;
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const sv=v=>Array.isArray(v)?v.join('–'):v;
@@ -236,6 +236,9 @@ async function copy(text,ta){if(ta)ta.value=text;try{await navigator.clipboard.w
 const uid=()=>'e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
 /* ---------- enemies (multi, autosaved) ---------- */
+/* motes: Essence 1–5 use the core formula; above 5, the values Pillars of Creation lists for antagonists */
+const MOTES_HI={6:17,7:20,8:20,9:22,10:27};
+const motesFor=E=>{E=Math.max(1,Math.round(+E||1));return E<=5?E*2+Math.floor((E-1)/2)+3:MOTES_HI[E]||27+(E-10)*3};
 const blank=()=>({id:uid(),system:'Exalted: Essence',name:'',concept:'',creature:'mortal',playerEssence:PE,tier:'standard',essence:1,motes:5,
   pools:{primary:{dice:8,actions:''},secondary:{dice:6,actions:''},tertiary:{dice:5,actions:''}},
   health:5,defense:3,soak:2,hardness:3,resolve:3,weapon:'',qualities:[],charms:[],notes:''});
@@ -278,7 +281,7 @@ function toFoundry(e){
     details:{exalt:isEx?(FX[e.creature]||e.creature):'other'},
     creaturetype:isEx?'exalt':(FCRE[e.creature]||'other'),
     essence:{min:0,value:ess,max:10},
-    motes:{value:Math.min(15,ess*2+Math.floor((ess-1)/2)+3),min:0,max:15,committed:0},
+    motes:{value:+e.motes>=0?+e.motes:motesFor(ess),min:0,max:15,committed:0},
     power:{min:0,value:0,max:10},
     defense:{min:0,value:+e.defense||0},
     soak:{min:0,value:+e.soak||0},naturalsoak:{min:0,value:+e.soak||0},armoredsoak:{min:0,value:0},
@@ -286,7 +289,7 @@ function toFoundry(e){
     health:{value:+e.health||1,min:0,max:+e.health||1,levels:+e.health||1,lethal:0,aggravated:0,penalty:0},
     pools:{primary:{value:+e.pools.primary.dice||0,actions:e.pools.primary.actions},secondary:{value:+e.pools.secondary.dice||0,actions:e.pools.secondary.actions},tertiary:{value:+e.pools.tertiary.dice||0,actions:e.pools.tertiary.actions}},
     qualities:e.qualities.map(q=>q.name).join(', '),
-    biography:`<p>${esc(e.concept)}</p>${e.notes?`<p>${esc(e.notes).replace(/\n/g,'<br>')}</p>`:''}<p><em>Essence Antagonist Forge${T.tiers[e.tier]?` · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier][L])}`:''}</em></p>`
+    biography:`<p>${esc(e.concept)}</p>${e.notes?`<p>${esc(e.notes).replace(/\n/g,'<br>')}</p>`:''}<p><b>Motes:</b> ${+e.motes||0}</p><p><em>Essence Antagonist Forge${T.tiers[e.tier]?` · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier][L])}`:''}</em></p>`
   };
   return {name:ename(e),type:'npc',img:'icons/svg/mystery-man.svg',system:sys,items,effects:[],flags:{'essence-antagonist-forge':{sourceId:e.id}},
     _stats:{systemId:'exaltedessence',systemVersion:'2.0.11',coreVersion:'13.345'}};
@@ -390,7 +393,7 @@ document.getElementById('view-templates').addEventListener('click',ev=>{
     const ty=/dragon/i.test(b.note?.en||'')&&b.type==='exalt'?'dragon-blooded':b.type, n=blank();
     const wm=(b.weapon||'').match(/^([^(;]*?)\s*\(([+-]\d+)\/([+-]\d+)\/[+-]?\d+, Ovw(\d+)/);
     Object.assign(n,{tier:'official',name:b.name,concept:(b.section||'')+' · '+BOOK[b.book||'core']+' p. '+b.page,creature:CREATURES.includes(ty)?ty:'other',essence:en,
-      motes:b.motes||Math.min(15,en*2+Math.floor((en-1)/2)+3),health:b.health,defense:b.defense,soak:b.soak,hardness:b.hardness,resolve:b.resolve,
+      motes:b.motes||motesFor(en),health:b.health,defense:b.defense,soak:b.soak,hardness:b.hardness,resolve:b.resolve,
       weapon:wm?`${wm[1].trim()} ${wm[2]}/${wm[3]}/${wm[4]}`:'',notes:[b.weapon,b.note&&b.note[L]].filter(Boolean).join('\n')});
     n.pools.primary.dice=b.pools[0];n.pools.secondary.dice=b.pools[1];n.pools.tertiary.dice=b.pools[2];
     (b.qualityIds||[]).forEach(id=>{const q=D.qualities.find(x=>x.id===id);if(q&&!n.qualities.some(x=>x.id===id))n.qualities.push(pickQ(q))});
@@ -445,7 +448,7 @@ function renderLibrary(){
    <label for="f-src">${t('source')}<select id="f-src">${opt('all',t('all'),F.src)}${EXALTS.map(e=>opt(e,SRC_LABEL[e]+(L==='pt'?' + universais, MA, feitiços':' + universal, MA, spells'),F.src)).join('')}${opt('universal','Universal',F.src)}${opt('martial-arts','Martial Arts',F.src)}${opt('sorcery',L==='pt'?'Feitiçaria / Necromancia':'Sorcery / Necromancy',F.src)}${opt('antagonist',I18N[L].kinds.antagonist,F.src)}${opt('quality',I18N[L].kinds.quality,F.src)}</select></label>
    <label for="f-book">${t('book')}<select id="f-book">${opt('all',t('allBooks'),F.book)}${Object.entries(BOOK).map(([k,l])=>opt(k,l,F.book)).join('')}</select></label>
    <label for="f-cat">${t('cat')}<select id="f-cat">${opt('all',t('all'),F.cat)}${Object.entries(I18N[L].kinds).map(([k,l])=>opt(k,l,F.cat)).join('')}</select></label>
-   <label for="f-ess">${t('maxEss')}<select id="f-ess">${[1,2,3,4,5].map(n=>opt(n,n,F.ess)).join('')}</select></label>
+   <label for="f-ess">${t('maxEss')}<select id="f-ess">${[1,2,3,4,5,6,7,8,9,10].map(n=>opt(n,n,F.ess)).join('')}</select></label>
    <label for="f-tag">${t('tag')}<select id="f-tag">${opt('all',t('any'),F.tag)}${Object.entries(I18N[L].tags).map(([k,l])=>opt(k,l,F.tag)).join('')}</select></label>
    <span class="count" id="count"></span>`;
   renderList();
@@ -507,7 +510,8 @@ const vb=document.getElementById('view-builder');
 vb.addEventListener('input',ev=>{const el=ev.target,e=E();if(el.id==='b-io')return;
   if(el.dataset.s){e[el.dataset.s]=el.value}
   else if(el.dataset.pool){e.pools[el.dataset.pool].actions=el.value}
-  else if(el.dataset.k){const v=+el.value||0,k=el.dataset.k;if(k==='p')e.pools.primary.dice=v;else if(k==='s')e.pools.secondary.dice=v;else if(k==='t')e.pools.tertiary.dice=v;else e[k]=v}
+  else if(el.dataset.k){const v=+el.value||0,k=el.dataset.k;if(k==='p')e.pools.primary.dice=v;else if(k==='s')e.pools.secondary.dice=v;else if(k==='t')e.pools.tertiary.dice=v;else e[k]=v;
+    if(k==='essence'&&el.value!==''){e.motes=motesFor(v);const mi=document.getElementById('b-motes');if(mi)mi.value=e.motes}}
   else return;
   save();renderDock();if(el.dataset.s==='name'||el.dataset.s==='creature')renderChrome()});
 vb.addEventListener('change',ev=>{if(ev.target.dataset.s==='creature'||ev.target.dataset.s==='name')renderBuilderKeepFocus()});
