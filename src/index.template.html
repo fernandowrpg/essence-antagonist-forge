@@ -1,0 +1,511 @@
+<title>Essence Antagonist Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky top bar with language toggle, tabbed workspace; charm list left, enemy sheet right on wide screens. */
+:root{
+  --bg:#eef1ee; --surface:#f9faf8; --sunk:#e3e8e4; --line:#cdd5cf; --fg:#1c2421; --muted:#5b6862;
+  --accent:#9a6a12; --accent-ink:#fff8ea; --jade:#2c7356; --warn:#a2452f;
+  --display:"Marcellus","Palatino Linotype",Georgia,serif;
+  --body:"Alegreya Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --c-universal:#6a7570; --c-solar:#b8860b; --c-lunar:#5c7f9e; --c-abyssal:#6b5a7a; --c-dragon-blooded:#2c7356;
+  --c-sidereal:#7a4fa0; --c-infernal:#4f8a2a; --c-alchemical:#6f7b86; --c-getimian:#2a8a8a; --c-liminal:#a2453a;
+  --c-exigent-janest:#a07a2a; --c-martial-arts:#8a5a3a; --c-sorcery:#3a5aa0; --c-quality:#5b6862;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121614; --surface:#1a201d; --sunk:#232b27; --line:#33403a; --fg:#e6e9e3; --muted:#9aa8a1;
+  --accent:#e2ad48; --accent-ink:#1d1606; --jade:#5fbf94; --warn:#e08a72;
+  --c-universal:#9aa6a0; --c-solar:#e2ad48; --c-lunar:#94b6d4; --c-abyssal:#b5a2c6; --c-dragon-blooded:#5fbf94;
+  --c-sidereal:#bf98e0; --c-infernal:#8fcf62; --c-alchemical:#a9b5c0; --c-getimian:#5fcaca; --c-liminal:#e08a7e;
+  --c-exigent-janest:#d8b467; --c-martial-arts:#d39b78; --c-sorcery:#8fa8e6; --c-quality:#9aa8a1; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1a201d; --sunk:#232b27; --line:#33403a; --fg:#e6e9e3; --muted:#9aa8a1;
+  --accent:#e2ad48; --accent-ink:#1d1606; --jade:#5fbf94; --warn:#e08a72;
+  --c-universal:#9aa6a0; --c-solar:#e2ad48; --c-lunar:#94b6d4; --c-abyssal:#b5a2c6; --c-dragon-blooded:#5fbf94;
+  --c-sidereal:#bf98e0; --c-infernal:#8fcf62; --c-alchemical:#a9b5c0; --c-getimian:#5fcaca; --c-liminal:#e08a7e;
+  --c-exigent-janest:#d8b467; --c-martial-arts:#d39b78; --c-sorcery:#8fa8e6; --c-quality:#9aa8a1; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--body);margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;gap:12px 20px;align-items:center;flex-wrap:wrap}
+.brand{font-family:var(--display);font-size:1.35rem;letter-spacing:.02em;margin-right:auto;white-space:nowrap}
+.brand small{font-family:var(--body);font-size:.8rem;color:var(--muted);margin-left:8px;letter-spacing:.06em;text-transform:uppercase}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:1px solid transparent;background:none;padding:6px 12px;border-radius:6px;cursor:pointer;color:var(--muted)}
+.tab[aria-selected="true"]{color:var(--fg);background:var(--sunk);border-color:var(--line)}
+.lang{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.lang button{border:0;background:none;padding:5px 10px;cursor:pointer;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+main{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:20px 60px}
+h2{font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0 0 4px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:400;font-size:1.15rem;margin:0;text-wrap:balance}
+.lede{color:var(--muted);max-width:70ch;margin:0 0 16px}
+.label{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center}
+.ess{display:flex;gap:6px}
+.ess button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-family:var(--display);font-size:1.2rem}
+.ess button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.strip{display:flex;gap:6px 22px;flex-wrap:wrap;padding:10px 14px;background:var(--sunk);border-radius:8px;margin:12px 0}
+.strip div{display:flex;flex-direction:column}
+.strip b{font-family:var(--mono);font-weight:500}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.07em;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.num{white-space:nowrap}
+.tier{font-family:var(--display);font-size:1.02rem;white-space:nowrap}
+.small{font-size:.85rem;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 10px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:12px}
+.filters label{display:flex;flex-direction:column;gap:2px;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.filters input,.filters select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:.95rem;text-transform:none;letter-spacing:0;color:var(--fg);min-width:0}
+.filters input[type=search]{width:min(260px,100%)}
+.count{color:var(--muted);font-size:.9rem;margin-left:auto}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media (max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
+.list{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.item{padding:12px 4px 12px 14px;border-bottom:1px solid var(--line);border-left:3px solid var(--src,var(--line));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px}
+.item h3{font-size:1.08rem}
+.meta{display:flex;gap:4px 12px;flex-wrap:wrap;font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.chip{display:inline-block;font-family:var(--body);font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--src);border:1px solid currentColor;border-radius:999px;padding:0 8px;line-height:1.6}
+.sum{grid-column:1/-1;margin:2px 0 0;max-width:80ch}
+details{grid-column:1/-1}
+summary{cursor:pointer;color:var(--muted);font-size:.88rem}
+.modes{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.modes li{font-size:.92rem;padding-left:10px;border-left:2px solid var(--line)}
+.modes li.hl{border-left-color:var(--accent);background:var(--sunk)}
+.modes b{font-weight:500}
+.sheet{position:sticky;top:calc(env(safe-area-inset-top,0px) + 74px);max-height:calc(100vh - 100px);overflow:auto}
+.sheet h3{margin-bottom:8px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}
+.stats label{display:flex;flex-direction:column;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.stats input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:4px 6px;font-family:var(--mono);font-size:.95rem}
+.field{display:flex;flex-direction:column;gap:2px;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:8px}
+.field input,.field textarea{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:.95rem;text-transform:none;letter-spacing:0;color:var(--fg)}
+.picked{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:4px}
+.picked li{display:flex;gap:8px;align-items:baseline;font-size:.9rem;border-bottom:1px dashed var(--line);padding:3px 0}
+.picked li span{flex:1;min-width:0}
+.x{border:0;background:none;color:var(--warn);cursor:pointer;font-size:1rem;padding:0 4px}
+textarea.io{width:100%;min-height:130px;font-family:var(--mono);font-size:.75rem;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:.9rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:16px}
+.qgroup h3{margin:18px 0 6px;color:var(--muted);font-size:1rem}
+.note{font-size:.88rem;color:var(--muted);max-width:80ch}
+.note li{margin-bottom:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ---- enemy dock ---- */
+.head{position:sticky;top:env(safe-area-inset-top,0px);z-index:6}
+.head .bar{position:static}
+.dock{background:var(--surface);border:1px solid var(--line);box-shadow:0 6px 24px rgb(0 0 0 / .12);display:flex;flex-direction:column;min-height:0;z-index:7}
+.dock-h{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--sunk)}
+.dock-h select{flex:1;min-width:120px;background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:4px 6px}
+.pos{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.pos button,.ib{border:0;background:var(--surface);width:30px;height:28px;cursor:pointer;color:var(--muted);font-size:.9rem}
+.pos button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.ib{border:1px solid var(--line);border-radius:5px}
+.dock-b{padding:10px 12px;overflow:auto;min-height:0}
+.dock-b h3{font-size:1.2rem}
+.statline{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:4px;margin:8px 0}
+.statline div{background:var(--sunk);border-radius:5px;padding:3px 6px;display:flex;flex-direction:column}
+.statline span{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.statline .wide{grid-column:span 2}
+.statline b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums}
+.dock-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.dock-actions .btn{font-size:.85rem;padding:4px 8px}
+.dock[data-min="1"] .dock-b{display:none}
+/* side docks */
+body[data-dock="right"] .dock,body[data-dock="left"] .dock{position:fixed;top:calc(var(--headh,64px) + 12px);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:330px;border-radius:10px}
+body[data-dock="right"] .dock{right:12px} body[data-dock="left"] .dock{left:12px}
+body[data-dock="right"] main{padding-right:calc(346px + 16px)} body[data-dock="left"] main{padding-left:calc(346px + 16px)}
+body[data-dock="right"] .dock[data-min="1"],body[data-dock="left"] .dock[data-min="1"]{bottom:auto}
+/* top / bottom docks */
+body[data-dock="top"] .dock{margin:8px auto 0;max-width:min(980px,calc(100% - 32px));border-radius:10px;max-height:36vh}
+body[data-dock="bottom"] .dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(980px,calc(100% - 32px));border-radius:10px;max-height:38vh}
+body[data-dock="bottom"] main{padding-bottom:calc(40vh + 20px)}
+body[data-dock="top"] .dock-b,body[data-dock="bottom"] .dock-b{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:4px 18px}
+body[data-dock="top"] .dock[data-min="1"] .dock-b,body[data-dock="bottom"] .dock[data-min="1"] .dock-b{display:none}
+@media (max-width:900px){
+  body[data-dock="right"] .dock,body[data-dock="left"] .dock{top:auto;left:50%;right:auto;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px);max-height:42vh}
+  body[data-dock="right"] main,body[data-dock="left"] main{padding-right:16px;padding-left:16px;padding-bottom:calc(44vh + 20px)}
+  body[data-dock] .dock-b{display:block!important}
+  body[data-dock] .dock[data-min="1"] .dock-b{display:none!important}
+  .pos-side{display:none}
+}
+.roster{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
+.roster li{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line)}
+.roster li[aria-current="true"] b{color:var(--accent)}
+.roster li span{flex:1;min-width:0}
+.btn.danger{color:var(--warn);border-color:var(--warn)}
+.field select{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:.95rem;text-transform:none;letter-spacing:0}
+.steps{font-size:.88rem;color:var(--muted);padding-left:18px;margin:6px 0}
+</style>
+
+<div class="head" id="head">
+ <div class="bar"><div class="bar-in">
+  <div class="brand">Essence Antagonist Forge<small data-t="sub"></small></div>
+  <nav role="tablist" id="tabs"></nav>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" id="lang-en" data-lang="en">EN</button>
+    <button type="button" id="lang-pt" data-lang="pt">PT</button>
+  </div>
+ </div></div>
+ <div id="dock-top-slot"></div>
+</div>
+
+<main>
+  <section id="view-templates"></section>
+  <section id="view-library" hidden></section>
+  <section id="view-builder" hidden></section>
+</main>
+<aside class="dock" id="dock" aria-label="Enemy preview"></aside>
+<div class="toast" id="toast" hidden></div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+const D=JSON.parse(document.getElementById('data').textContent);
+const T=D.templates;
+const SRC_LABEL={universal:'Universal',solar:'Solar',lunar:'Lunar',abyssal:'Abyssal','dragon-blooded':'Dragon-Blooded',sidereal:'Sidereal',infernal:'Infernal',alchemical:'Alchemical',getimian:'Getimian',liminal:'Liminal','exigent-janest':'Exigent (Janest)','martial-arts':'Martial Arts',sorcery:'Sorcery',necromancy:'Necromancy'};
+const EXALTS=['solar','lunar','abyssal','dragon-blooded','sidereal','infernal','alchemical','getimian','liminal','exigent-janest'];
+const CREATURES=['mortal',...EXALTS,'god','demon','elemental','undead','fae','behemoth','animal','other'];
+const CRE_LABEL={en:{mortal:'Mortal',god:'God',demon:'Demon',elemental:'Elemental',undead:'Undead / ghost',fae:'Fair Folk',behemoth:'Behemoth',animal:'Animal',other:'Other'},pt:{mortal:'Mortal',god:'Deus',demon:'Demônio',elemental:'Elemental',undead:'Morto-vivo / fantasma',fae:'Fair Folk',behemoth:'Behemoth',animal:'Animal',other:'Outro'}};
+const I18N={
+ en:{sub:'Exalted: Essence',templates:'Templates',library:'Library',builder:'Enemies',
+  tplTitle:'Stat templates by Circle Essence',tplLede:'Pick the Essence of the players’ Circle. Each row is a starting point for an antagonist of that tier; tune any value by up to ±3.',
+  pc:'Your Circle at this Essence',motes:'Motes',hardness:'Hardness',health:'Health',soak:'Soak',defense:'Defense',resolve:'Resolve',essence:'Essence',pools:'Pools (P/S/T)',charms:'Charms',qualities:'Qualities',weapon:'Weapon (acc/dmg/ovw)',use:'Use on active enemy',
+  bg:'Battle groups',bgSize:'Size',fighters:'Fighters',ovw:'Overwhelming',drill:'Drill',bonus:'Bonus',freeQ:'Free quality',rout:'Rout check when',official:'Official stat blocks',type:'Type',page:'p.',rules:'Rules behind these numbers',
+  libTitle:'Charms, spells and qualities',libLede:'Every Charm, martial art, spell and antagonist quality in the core book, distilled to what an antagonist needs. Pick an Exalt type to see its Charms plus universal Charms, martial arts and spells, with that type’s modes highlighted.',
+  search:'Search',source:'Exalt type / source',all:'All',cat:'Kind',maxEss:'Max Essence',tag:'Focus',any:'Any',results:'results',modes:'modes',add:'Add',added:'Added to',
+  kinds:{charm:'Charm','martial-art':'Martial art',spell:'Spell','shaping-ritual':'Shaping ritual',quality:'Quality'},
+  tags:{offense:'Offense',defense:'Defense',social:'Social',movement:'Movement',power:'Power',healing:'Healing',venture:'Ventures','mass-combat':'Mass combat',stealth:'Stealth',supernatural:'Supernatural'},
+  qtypes:{general:'General',exalted:'Exalted',social:'Social',spirit:'Spirit',outnumber:'Outnumber',supernatural:'Supernatural',animal:'Animal'},
+  bTitle:'Enemy sheet',name:'Name',concept:'Concept',creature:'Creature type',prim:'Primary',sec:'Secondary',ter:'Tertiary',actions:'actions (comma separated)',notes:'Notes',
+  picked:'Charms & qualities',none:'Nothing added yet. Use Add in the Library.',unnamed:'Unnamed enemy',
+  roster:'Your enemies',rosterLede:'Every change saves automatically in this browser. Open an enemy to make it the active one; Library additions and templates go to the active enemy.',
+  newE:'New enemy',dup:'Duplicate',del:'Delete',confirmDel:'Confirm delete',open:'Open',active:'Active',
+  edit:'Edit',foundryMacro:'Foundry macro',foundryJson:'Foundry JSON',enemyJson:'Enemy JSON',loadJ:'Load as new enemy',copyLib:'Copy full library JSON',
+  fTitle:'Send to Foundry VTT',fLede:'Built for the Exalted Essence system 2.0.11 (Foundry 13). Creates an NPC with its stats, pools, weapon, qualities and Charms as items.',
+  fSteps:['In Foundry, open Macros, create a new macro and set its type to Script.','Paste the macro copied here and run it. The NPC opens ready to use.','Alternative: save the Foundry JSON as a .json file, create an NPC, right-click it in the Actors tab and choose Import Data.'],
+  ioLede:'The box shows the last thing you copied. Paste an enemy JSON here and press Load as new enemy to bring it back.',
+  copied:'Copied to clipboard',copyFail:'Clipboard blocked. The text is selected in the box; copy it manually.',loaded:'Enemy loaded',badJson:'That text is not valid enemy JSON. Check that it starts with { and was copied completely.',
+  fromTpl:'Base',mode:'Mode',libNote:'Summaries are distilled from the book for antagonist use. Check the page reference for full rules.',cost:'Cost',step:'Step',
+  dockPos:'Preview position',top:'Top',left:'Left',right:'Right',bottom:'Bottom',minimize:'Minimize',expand:'Expand'},
+ pt:{sub:'Exalted: Essence',templates:'Templates',library:'Biblioteca',builder:'Inimigos',
+  tplTitle:'Templates de stats por Essence do Círculo',tplLede:'Escolha a Essence do Círculo dos jogadores. Cada linha é um ponto de partida para um antagonista daquele nível; ajuste qualquer valor em até ±3.',
+  pc:'Seu Círculo nesta Essence',motes:'Motes',hardness:'Hardness',health:'Health',soak:'Soak',defense:'Defense',resolve:'Resolve',essence:'Essence',pools:'Pools (P/S/T)',charms:'Charms',qualities:'Qualidades',weapon:'Arma (acerto/dano/ovw)',use:'Aplicar no inimigo ativo',
+  bg:'Grupos de batalha',bgSize:'Size',fighters:'Combatentes',ovw:'Overwhelming',drill:'Drill',bonus:'Bônus',freeQ:'Qualidade grátis',rout:'Teste de debandada quando',official:'Blocos oficiais',type:'Tipo',page:'p.',rules:'Regras por trás destes números',
+  libTitle:'Charms, feitiços e qualidades',libLede:'Todos os Charms, artes marciais, feitiços e qualidades de antagonista do livro básico, destilados no que um antagonista precisa. Escolha um tipo de Exaltado para ver os Charms dele mais os universais, artes marciais e feitiços, com os modos desse tipo destacados.',
+  search:'Buscar',source:'Tipo de Exaltado / fonte',all:'Todos',cat:'Tipo',maxEss:'Essence máx.',tag:'Foco',any:'Qualquer',results:'resultados',modes:'modos',add:'Adicionar',added:'Adicionado a',
+  kinds:{charm:'Charm','martial-art':'Arte marcial',spell:'Feitiço','shaping-ritual':'Ritual de moldagem',quality:'Qualidade'},
+  tags:{offense:'Ofensiva',defense:'Defesa',social:'Social',movement:'Movimento',power:'Power',healing:'Cura',venture:'Projetos','mass-combat':'Combate em massa',stealth:'Furtividade',supernatural:'Sobrenatural'},
+  qtypes:{general:'Gerais',exalted:'Exaltados',social:'Sociais',spirit:'Espíritos',outnumber:'Outnumber',supernatural:'Sobrenaturais',animal:'Animais'},
+  bTitle:'Ficha do inimigo',name:'Nome',concept:'Conceito',creature:'Tipo de criatura',prim:'Primária',sec:'Secundária',ter:'Terciária',actions:'ações (separadas por vírgula)',notes:'Notas',
+  picked:'Charms e qualidades',none:'Nada adicionado ainda. Use Adicionar na Biblioteca.',unnamed:'Inimigo sem nome',
+  roster:'Seus inimigos',rosterLede:'Toda alteração é salva automaticamente neste navegador. Abra um inimigo para torná-lo o ativo; o que você adiciona na Biblioteca e nos Templates vai para o inimigo ativo.',
+  newE:'Novo inimigo',dup:'Duplicar',del:'Excluir',confirmDel:'Confirmar exclusão',open:'Abrir',active:'Ativo',
+  edit:'Editar',foundryMacro:'Macro do Foundry',foundryJson:'JSON do Foundry',enemyJson:'JSON do inimigo',loadJ:'Carregar como novo inimigo',copyLib:'Copiar JSON da biblioteca',
+  fTitle:'Enviar para o Foundry VTT',fLede:'Feito para o sistema Exalted Essence 2.0.11 (Foundry 13). Cria um NPC com stats, pools, arma, qualidades e Charms como itens.',
+  fSteps:['No Foundry, abra Macros, crie uma macro nova e mude o tipo para Script.','Cole a macro copiada aqui e execute. O NPC abre pronto para usar.','Alternativa: salve o JSON do Foundry como arquivo .json, crie um NPC, clique com o botão direito nele na aba Actors e escolha Import Data.'],
+  ioLede:'A caixa mostra o último texto copiado. Cole um JSON de inimigo aqui e clique em Carregar como novo inimigo para trazê-lo de volta.',
+  copied:'Copiado',copyFail:'Área de transferência bloqueada. O texto está selecionado na caixa; copie manualmente.',loaded:'Inimigo carregado',badJson:'Esse texto não é um JSON de inimigo válido. Confira se começa com { e se foi copiado inteiro.',
+  fromTpl:'Base',mode:'Modo',libNote:'Os resumos são destilados do livro para uso com antagonistas. Consulte a página para as regras completas.',cost:'Custo',step:'Step',
+  dockPos:'Posição da prévia',top:'Acima',left:'Esquerda',right:'Direita',bottom:'Abaixo',minimize:'Minimizar',expand:'Expandir'}
+};
+const store={get(k,d){try{const v=localStorage.getItem('eaf.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('eaf.'+k,JSON.stringify(v))}catch(e){}}};
+let L=store.get('lang','en'), TAB=store.get('tab','templates'), PE=store.get('pe',1);
+let DOCK=store.get('dock','right'), DMIN=store.get('dmin',false);
+let F=Object.assign({q:'',src:'all',cat:'all',ess:'5',tag:'all'},store.get('filters',{}));
+const t=k=>I18N[L][k]??k;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sv=v=>Array.isArray(v)?v.join('–'):v;
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>e.hidden=true,2400)}
+async function copy(text,ta){if(ta)ta.value=text;try{await navigator.clipboard.writeText(text);toast(t('copied'))}catch(e){if(ta){ta.focus();ta.select()}toast(t('copyFail'))}}
+const uid=()=>'e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ---------- enemies (multi, autosaved) ---------- */
+const blank=()=>({id:uid(),system:'Exalted: Essence',name:'',concept:'',creature:'mortal',playerEssence:PE,tier:'standard',essence:1,motes:5,
+  pools:{primary:{dice:8,actions:''},secondary:{dice:6,actions:''},tertiary:{dice:5,actions:''}},
+  health:5,defense:3,soak:2,hardness:3,resolve:3,weapon:'',qualities:[],charms:[],notes:''});
+let ROSTER=store.get('enemies',null);
+if(!Array.isArray(ROSTER)||!ROSTER.length){const old=store.get('enemy',null);ROSTER=[old?Object.assign(blank(),old,{id:uid()}):blank()]}
+ROSTER.forEach(e=>{if(!e.id)e.id=uid();if(!e.creature)e.creature='other'});
+let ACTIVE=store.get('active',ROSTER[0].id); if(!ROSTER.some(e=>e.id===ACTIVE))ACTIVE=ROSTER[0].id;
+const E=()=>ROSTER.find(e=>e.id===ACTIVE);
+let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(()=>{store.set('enemies',ROSTER);store.set('active',ACTIVE)},150)}
+const ename=e=>e.name||t('unnamed');
+
+/* ---------- Foundry export (Exalted Essence system 2.0.11) ---------- */
+const LIB=new Map([...D.charms,...D.qualities].map(x=>[x.id,x]));
+const FX={'dragon-blooded':'dragonblooded','exigent-janest':'exigent'};
+const FCHARM={'dragon-blooded':'dragonblooded','exigent-janest':'janest','martial-arts':'martialarts',universal:'other',sorcery:'other'};
+const FCRE={mortal:'mortal',god:'god',demon:'demon',elemental:'elemental',undead:'undead',fae:'fae',behemoth:'behemoth',animal:'animal',other:'other'};
+function fAbility(s){s=(s||'').toLowerCase();for(const k of['close','ranged','physique','sagacity','athletics','awareness','craft','embassy','integrity','navigate','performance','presence','stealth','war','finesse','force','fortitude'])if(s.startsWith(k))return k;return 'other'}
+function fCost(c){c=c||'';const o={motes:0,committed:0,anima:0,health:0,healthtype:'bashing',stunt:0,power:0};let m;
+  if(m=c.match(/(commit )?(\d+)m/))o[m[1]?'committed':'motes']=+m[2];if(m=c.match(/(\d+)a\b/))o.anima=+m[1];if(m=c.match(/(\d+) HL/))o.health=+m[1];
+  if(m=c.match(/(\d+) Power/))o.power=+m[1];if(m=c.match(/(\d+) stunt/))o.stunt=+m[1];return o}
+const gain={motes:0,anima:0,health:0,power:0};
+const act={activatable:false,active:false,autoaddtorolls:'',endtrigger:'none'};
+function fDesc(x,ref){let h=`<p>${esc(x.summary[L])}</p>`;if(x.mode)h+=`<p><strong>${t('mode')}: ${esc(x.mode.name)}</strong> — ${esc(x.mode.summary[L])}</p>`;
+  if(ref&&ref.prerequisites)h+=`<p><em>${esc(ref.prerequisites)}</em></p>`;return h+`<p><em>Exalted: Essence p. ${x.page}</em></p>`}
+function toFoundry(e){
+  const isEx=EXALTS.includes(e.creature);
+  const items=[];
+  const w=(e.weapon||'').match(/([+-]?\d+)\s*\/\s*([+-]?\d+)\s*\/\s*(\d+)/);
+  const wn=e.weapon.replace(/\s*[+-]?\d+\s*\/.*$/,'').trim(),wl=L==='pt'?'Arma':'Weapon',wname=!wn?wl:/^(natural |heavy |mundane )?artifact$|^(mundane|heavy|medium|light)$/i.test(wn)?`${wl} (${wn})`:wn;
+  if(w)items.push({name:wname,type:'weapon',system:{description:'',pagenum:'',accuracy:+w[1],damage:+w[2],defence:0,defense:0,overwhelming:+w[3],equipped:true,weapontype:/ranged|bow|wand|bolt/i.test(e.weapon)?'ranged':'melee',attackeffectpreset:'none',attackeffect:'',weight:/heavy|pesad/i.test(e.weapon)?'heavy':'medium',traits:{weapontags:{value:[],custom:''}}}});
+  e.qualities.forEach(q=>items.push({name:q.name,type:'quality',system:{description:fDesc(q),pagenum:'p. '+q.page,...act,cost:fCost((q.summary.en.match(/(commit )?\d+m\b/i)||[''])[0].toLowerCase()),gain:{...gain}}}));
+  e.charms.forEach(c=>{const r=LIB.get(c.id)||{};
+    if(r.category==='spell'){items.push({name:c.name,type:'spell',system:{description:fDesc(c,r),pagenum:'p. '+c.page,...act,circle:['','first','second','third'][r.circle||1],cost:+((c.cost||'').match(/\d+/)||[0])[0],spelltype:r.school||'universal'}});return}
+    const req=+(((r.prerequisites||'').match(/[A-Za-z)]\s(\d)/)||[])[1]||0);
+    items.push({name:c.name,type:'charm',system:{description:fDesc(c,r),pagenum:'p. '+c.page,...act,cost:fCost(c.cost),gain:{...gain},
+      charmtype:FCHARM[r.source]||FX[r.source]||r.source||'other',ability:r.category==='martial-art'?'martial':fAbility(r.ability),requirement:req,essence:r.minEssence||1,prerequisites:r.prerequisites||'',charmprerequisites:[]}});
+  });
+  const ess=Math.max(1,+e.essence||1);
+  const sys={
+    details:{exalt:isEx?(FX[e.creature]||e.creature):'other'},
+    creaturetype:isEx?'exalt':(FCRE[e.creature]||'other'),
+    essence:{min:0,value:ess,max:10},
+    motes:{value:Math.min(15,ess*2+Math.floor((ess-1)/2)+3),min:0,max:15,committed:0},
+    power:{min:0,value:0,max:10},
+    defense:{min:0,value:+e.defense||0},
+    soak:{min:0,value:+e.soak||0},naturalsoak:{min:0,value:+e.soak||0},armoredsoak:{min:0,value:0},
+    hardness:{min:0,value:+e.hardness||0},resolve:{min:0,value:+e.resolve||0},
+    health:{value:+e.health||1,min:0,max:+e.health||1,levels:+e.health||1,lethal:0,aggravated:0,penalty:0},
+    pools:{primary:{value:+e.pools.primary.dice||0,actions:e.pools.primary.actions},secondary:{value:+e.pools.secondary.dice||0,actions:e.pools.secondary.actions},tertiary:{value:+e.pools.tertiary.dice||0,actions:e.pools.tertiary.actions}},
+    qualities:e.qualities.map(q=>q.name).join(', '),
+    biography:`<p>${esc(e.concept)}</p>${e.notes?`<p>${esc(e.notes).replace(/\n/g,'<br>')}</p>`:''}<p><em>Essence Antagonist Forge · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier]?.[L]||'')}</em></p>`
+  };
+  return {name:ename(e),type:'npc',img:'icons/svg/mystery-man.svg',system:sys,items,effects:[],flags:{'essence-antagonist-forge':{sourceId:e.id}},
+    _stats:{systemId:'exaltedessence',systemVersion:'2.0.11',coreVersion:'13.345'}};
+}
+function toMacro(e){const d=toFoundry(e);delete d._stats;
+  return `// Essence Antagonist Forge -> Exalted Essence 2.0.11\n// ${d.name}\nconst data = ${JSON.stringify(d,null,1)};\nconst actor = await Actor.implementation.create(data);\nif (actor) { ui.notifications.info(\`\${actor.name} criado / created\`); actor.sheet.render(true); }\n`}
+
+/* ---------- chrome ---------- */
+function renderChrome(){
+  document.documentElement.lang=L==='pt'?'pt-BR':'en';
+  document.body.dataset.dock=DOCK;
+  document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
+  document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===L));
+  document.getElementById('tabs').innerHTML=['templates','library','builder'].map(k=>`<button class="tab" role="tab" id="tab-${k}" aria-selected="${TAB===k}" data-tab="${k}">${t(k)}${k==='builder'?` <span class="num">(${ROSTER.length})</span>`:''}</button>`).join('');
+  ['templates','library','builder'].forEach(k=>document.getElementById('view-'+k).hidden=TAB!==k);
+  const dock=document.getElementById('dock'),slot=document.getElementById('dock-top-slot');
+  if(DOCK==='top'){if(dock.parentNode!==slot)slot.appendChild(dock)}else if(dock.parentNode!==document.body)document.body.insertBefore(dock,document.getElementById('toast'));
+}
+function goTab(k){TAB=k;store.set('tab',TAB);renderAll()}
+document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)goTab(b.dataset.tab)});
+document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>{L=b.dataset.lang;store.set('lang',L);renderAll()}));
+const head=document.getElementById('head');
+new ResizeObserver(()=>document.documentElement.style.setProperty('--headh',head.offsetHeight+'px')).observe(head);
+
+/* ---------- dock ---------- */
+function pickedHTML(e){
+  const all=[...e.qualities.map(x=>({...x,k:'q'})),...e.charms.map(x=>({...x,k:'c'}))];
+  if(!all.length)return `<p class="small">${t('none')}</p>`;
+  return `<ul class="picked">${all.map(x=>`<li><span><b>${esc(x.name)}</b>${x.cost?` <span class="mono small">${esc(x.cost)}</span>`:''}<br><span class="small">${esc((x.summary||{})[L]||'')}</span>${x.mode?`<br><span class="small"><b>${t('mode')}: ${esc(x.mode.name)}</b> — ${esc(x.mode.summary[L])}</span>`:''}</span><button class="x" type="button" aria-label="Remove ${esc(x.name)}" data-rm="${x.k}:${x.id}">×</button></li>`).join('')}</ul>`;
+}
+function statline(e){const s=(l,v)=>`<div><span>${l}</span><b>${esc(v)}</b></div>`;
+  return `<div class="statline">${s('Ess',e.essence)}${s(t('motes'),e.motes)}<div class="wide"><span>Pools</span><b>${e.pools.primary.dice}/${e.pools.secondary.dice}/${e.pools.tertiary.dice}</b></div>${s('HL',e.health)}${s('Def',e.defense)}${s('Soak',e.soak)}${s('Hard',e.hardness)}${s('Res',e.resolve)}</div>`}
+function creLabel(c){return SRC_LABEL[c]||CRE_LABEL[L][c]||c}
+function renderDock(){
+  const e=E(),d=document.getElementById('dock');
+  d.dataset.min=DMIN?'1':'0';
+  const pb=(k,ic,cls='')=>`<button type="button" class="${cls}" data-pos="${k}" aria-pressed="${DOCK===k}" title="${t(k)}" aria-label="${t('dockPos')}: ${t(k)}">${ic}</button>`;
+  const pools=['primary','secondary','tertiary'].filter(k=>e.pools[k].actions).map(k=>`<div class="small"><b>${t({primary:'prim',secondary:'sec',tertiary:'ter'}[k])} ${e.pools[k].dice}:</b> ${esc(e.pools[k].actions)}</div>`).join('');
+  d.innerHTML=`<div class="dock-h">
+    <select id="dock-sel" aria-label="${t('roster')}">${ROSTER.map(x=>`<option value="${x.id}" ${x.id===ACTIVE?'selected':''}>${esc(ename(x))}</option>`).join('')}</select>
+    <button class="ib" type="button" id="dock-new" title="${t('newE')}" aria-label="${t('newE')}">+</button>
+    <div class="pos" role="group" aria-label="${t('dockPos')}">${pb('top','↑')}${pb('left','←','pos-side')}${pb('right','→','pos-side')}${pb('bottom','↓')}</div>
+    <button class="ib" type="button" id="dock-min" aria-label="${DMIN?t('expand'):t('minimize')}" title="${DMIN?t('expand'):t('minimize')}">${DMIN?'▢':'–'}</button>
+  </div>
+  <div class="dock-b"><div>
+    <h3>${esc(ename(e))}</h3><div class="small">${esc(creLabel(e.creature))} · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier]?.[L]||'')}</div>
+    ${e.concept?`<div class="small">${esc(e.concept)}</div>`:''}
+    ${statline(e)}${pools}${e.weapon?`<div class="small"><b>${t('weapon')}:</b> ${esc(e.weapon)}</div>`:''}
+    <div class="dock-actions"><button class="btn" type="button" data-go="builder">${t('edit')}</button><button class="btn primary" type="button" data-fx="macro">${t('foundryMacro')}</button><button class="btn" type="button" data-fx="json">${t('foundryJson')}</button></div>
+   </div><div><div class="label" style="margin-top:6px">${t('picked')} (${e.charms.length+e.qualities.length})</div>${pickedHTML(e)}</div></div>`;
+}
+const dockEl=document.getElementById('dock');
+dockEl.addEventListener('change',ev=>{if(ev.target.id==='dock-sel'){ACTIVE=ev.target.value;save();renderAll()}});
+dockEl.addEventListener('click',ev=>{
+  const p=ev.target.closest('[data-pos]');if(p){DOCK=p.dataset.pos;store.set('dock',DOCK);renderChrome();renderDock();return}
+  if(ev.target.closest('#dock-min')){DMIN=!DMIN;store.set('dmin',DMIN);renderDock();return}
+  if(ev.target.closest('#dock-new')){newEnemy();return}
+  const r=ev.target.closest('[data-rm]');if(r){rm(r.dataset.rm);return}
+  const g=ev.target.closest('[data-go]');if(g){goTab(g.dataset.go);return}
+  const f=ev.target.closest('[data-fx]');if(f)exportFx(f.dataset.fx);
+});
+function exportFx(kind,e=E()){const ta=document.getElementById('b-io');
+  const s=kind==='macro'?toMacro(e):kind==='json'?JSON.stringify(toFoundry(e),null,2):JSON.stringify(e,null,2);copy(s,ta)}
+function rm(k){const e=E(),[t2,id]=k.split(/:(.+)/);if(t2==='q')e.qualities=e.qualities.filter(x=>x.id!==id);else e.charms=e.charms.filter(x=>x.id!==id);save();renderDock();if(TAB==='builder')renderBuilder();if(TAB==='library')renderList()}
+function newEnemy(base){const n=base?Object.assign(JSON.parse(JSON.stringify(base)),{id:uid()}):blank();ROSTER.push(n);ACTIVE=n.id;save();renderAll();return n}
+
+/* ---------- templates ---------- */
+function renderTemplates(){
+  const row=T.byEssence[PE], p=T.players[PE];
+  const tiers=['extra','standard','elite','boss','nemesis'];
+  document.getElementById('view-templates').innerHTML=`
+  <h2>${t('tplTitle')}</h2><p class="lede">${t('tplLede')}</p>
+  <div class="row"><span class="label">${t('essence')}</span><div class="ess" role="group">${[1,2,3,4,5].map(n=>`<button type="button" id="pe-${n}" data-pe="${n}" aria-pressed="${PE==n}">${n}</button>`).join('')}</div></div>
+  <p class="note" style="margin-top:12px">${esc(row.challenge[L])}</p>
+  <div class="strip"><span class="label" style="align-self:center">${t('pc')}</span>
+   <div><span class="label">${t('motes')}</span><b>${p.motes}</b></div><div><span class="label">${t('hardness')}</span><b>${p.hardness}+</b></div>
+   <div><span class="label">${t('health')}</span><b>${p.health}</b></div><div><span class="label">${t('defense')}</span><b>${p.defense}</b></div>
+   <div><span class="label">${t('soak')}</span><b>${p.soak}</b></div><div><span class="label">${t('resolve')}</span><b>${p.resolve}</b></div></div>
+  <div class="panel scroll"><table><thead><tr><th></th><th>${t('essence')}</th><th>${t('pools')}</th><th>${t('health')}</th><th>${t('defense')}</th><th>${t('soak')}</th><th>${t('hardness')}</th><th>${t('resolve')}</th><th>${t('motes')}</th><th>${t('charms')}</th><th>${t('qualities')}</th><th>${t('weapon')}</th><th></th></tr></thead><tbody>
+  ${tiers.map(k=>{const r=row[k];return `<tr><td><div class="tier">${esc(T.tiers[k][L])}</div><div class="small">${esc(r.refs.join(' · '))}</div></td>
+   <td class="num">${r.essence||'—'}</td><td class="num">${r.pools.join('/')}</td><td class="num">${r.health}</td><td class="num">${r.defense}</td><td class="num">${r.soak}</td><td class="num">${r.hardness}</td><td class="num">${r.resolve}</td><td class="num">${r.motes||'—'}</td><td class="num">${sv(r.charms)||'—'}</td>
+   <td class="small" style="min-width:180px">${esc(r.qualities.join(', '))}</td><td class="num small">${esc(r.weapon)}</td>
+   <td><button class="btn" type="button" data-use="${k}">${t('use')}</button></td></tr>`}).join('')}
+  </tbody></table></div>
+  <div class="grid2" style="margin-top:22px">
+   <div class="panel"><h3>${t('rules')}</h3><ul class="note">${T.notes[L].map(n=>`<li>${esc(n)}</li>`).join('')}</ul></div>
+   <div class="panel"><h3>${t('bg')}</h3>
+    <div class="scroll"><table><thead><tr><th>${t('bgSize')}</th><th>${t('fighters')}</th><th>${t('health')}</th><th>${t('ovw')}</th></tr></thead><tbody>
+    ${T.battleGroups.sizes.map(s=>`<tr><td class="num">${s.size}</td><td>${esc(s.fighters[L])}</td><td class="num">${s.health}</td><td class="num">${s.overwhelming}</td></tr>`).join('')}</tbody></table></div>
+    <div class="scroll" style="margin-top:10px"><table><thead><tr><th>${t('drill')}</th><th>${t('bonus')}</th><th>${t('freeQ')}</th><th>${t('rout')}</th></tr></thead><tbody>
+    ${T.battleGroups.drill.map(d=>`<tr><td>${d.drill}</td><td class="num">+${d.bonus}</td><td>${d.quality}</td><td class="small">${esc(d.rout[L])}</td></tr>`).join('')}</tbody></table></div>
+    <p class="note">${esc(T.battleGroups.notes[L])}</p></div>
+  </div>
+  <div class="panel scroll" style="margin-top:16px"><h3 style="margin-bottom:8px">${t('official')}</h3><table><thead><tr><th>${t('name')}</th><th>${t('type')}</th><th>${t('essence')}</th><th>${t('pools')}</th><th>${t('health')}</th><th>${t('defense')}</th><th>${t('soak')}</th><th>${t('hardness')}</th><th>${t('resolve')}</th><th>${t('page')}</th></tr></thead><tbody>
+  ${T.officialBlocks.map(b=>`<tr><td>${esc(b.name)}</td><td class="small">${esc(b.type)}</td><td class="num">${b.essence||'—'}</td><td class="num">${b.pools.join('/')}</td><td class="num">${b.health}</td><td class="num">${b.defense}</td><td class="num">${b.soak}</td><td class="num">${b.hardness}</td><td class="num">${b.resolve}</td><td class="num">${b.page}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+document.getElementById('view-templates').addEventListener('click',ev=>{
+  const pe=ev.target.closest('[data-pe]'); if(pe){PE=+pe.dataset.pe;store.set('pe',PE);renderTemplates();return}
+  const u=ev.target.closest('[data-use]'); if(u){const k=u.dataset.use,r=T.byEssence[PE][k],e=E();
+    Object.assign(e,{playerEssence:PE,tier:k,essence:r.essence||1,motes:r.motes,health:r.health,defense:r.defense,soak:r.soak,hardness:r.hardness,resolve:r.resolve,weapon:r.weapon});
+    e.pools.primary.dice=r.pools[0];e.pools.secondary.dice=r.pools[1];e.pools.tertiary.dice=r.pools[2];
+    r.qualities.forEach(n=>{const q=D.qualities.find(x=>x.name===n);if(q&&!e.qualities.some(x=>x.id===q.id))e.qualities.push(pickQ(q))});
+    save();renderDock();toast(t('added')+' '+ename(e))}
+});
+
+/* ---------- library ---------- */
+const ALL=[...D.charms,...D.qualities];
+function filtered(){
+  const q=F.q.trim().toLowerCase(), me=+F.ess;
+  return ALL.filter(x=>{
+    if(F.cat!=='all'&&x.category!==F.cat)return false;
+    if(F.src!=='all'){
+      if(F.src==='quality'){if(x.category!=='quality')return false}
+      else if(EXALTS.includes(F.src)){if(!(x.source===F.src||['universal','martial-arts','sorcery'].includes(x.source)))return false}
+      else if(x.source!==F.src)return false}
+    if(x.minEssence&&x.minEssence>me)return false;
+    if(F.tag!=='all'&&!(x.tags||[]).includes(F.tag))return false;
+    if(q){const hay=(x.name+' '+(x.ability||'')+' '+(x.style||'')+' '+x.summary.en+' '+x.summary.pt+' '+(x.modes||[]).map(m=>m.name).join(' ')).toLowerCase();if(!hay.includes(q))return false}
+    return true});
+}
+const hlType=()=>EXALTS.includes(F.src)?F.src:(EXALTS.includes(E().creature)?E().creature:null);
+function itemHTML(x){
+  const src=x.category==='quality'?'quality':x.source;
+  const kind=I18N[L].kinds[x.category];
+  const sub=x.category==='quality'?I18N[L].qtypes[x.qualityType]:(x.ability||x.style||(x.circle?`${['','1st','2nd','3rd'][x.circle]} circle · ${x.school}`:x.school)||'');
+  const ms=(x.modes||[]), hl=hlType();
+  const sorted=hl?[...ms].sort((a,b)=>(b.exalts.includes(hl))-(a.exalts.includes(hl))):ms;
+  const has=E().charms.some(c=>c.id===x.id)||E().qualities.some(c=>c.id===x.id);
+  return `<article class="item" style="--src:var(--c-${src})">
+   <div><h3>${esc(x.name)}</h3><div class="meta"><span class="chip">${esc(x.category==='quality'?kind:SRC_LABEL[x.source])}</span><span>${esc(sub)}</span>${x.cost?`<span>${t('cost')} ${esc(x.cost)}</span>`:''}${x.step?`<span>${t('step')} ${esc(x.step)}</span>`:''}${x.minEssence>1?`<span>Ess ${x.minEssence}+</span>`:''}${x.prerequisites?`<span title="${esc(x.prerequisites)}">${esc(x.prerequisites.length>40?x.prerequisites.slice(0,40)+'…':x.prerequisites)}</span>`:''}<span>${t('page')} ${x.page}</span></div></div>
+   <div><button class="btn" type="button" data-add="${x.id}" ${has?'disabled':''}>${has?'✓':'+ '+t('add')}</button></div>
+   <p class="sum">${esc(x.summary[L])}</p>
+   ${ms.length?`<details ${hl&&ms.some(m=>m.exalts.includes(hl))?'open':''}><summary>${ms.length} ${t('modes')}</summary><ul class="modes">${sorted.map(m=>`<li class="${hl&&m.exalts.includes(hl)?'hl':''}"><b>${esc(m.name)}</b> <span class="small">(${m.exalts.map(e=>SRC_LABEL[e]).join(', ')})</span> — ${esc(m.summary[L])}</li>`).join('')}</ul></details>`:''}
+  </article>`;
+}
+let LIMIT=60;
+function renderLibrary(){
+  const v=document.getElementById('view-library');
+  if(!v.dataset.built){v.innerHTML=`<h2 id="lib-h"></h2><p class="lede" id="lib-l"></p><div class="filters" id="filters"></div><div class="list" id="list"></div><div style="text-align:center;margin-top:14px"><button class="btn" type="button" id="more" hidden>+60</button></div>`;v.dataset.built=1}
+  document.getElementById('lib-h').textContent=t('libTitle');document.getElementById('lib-l').textContent=t('libLede');
+  const opt=(v,l,cur)=>`<option value="${v}" ${cur==v?'selected':''}>${esc(l)}</option>`;
+  document.getElementById('filters').innerHTML=`
+   <label for="f-q">${t('search')}<input type="search" id="f-q" value="${esc(F.q)}"></label>
+   <label for="f-src">${t('source')}<select id="f-src">${opt('all',t('all'),F.src)}${EXALTS.map(e=>opt(e,SRC_LABEL[e]+(L==='pt'?' + universais, MA, feitiços':' + universal, MA, spells'),F.src)).join('')}${opt('universal','Universal',F.src)}${opt('martial-arts','Martial Arts',F.src)}${opt('sorcery',L==='pt'?'Feitiçaria / Necromancia':'Sorcery / Necromancy',F.src)}${opt('quality',I18N[L].kinds.quality,F.src)}</select></label>
+   <label for="f-cat">${t('cat')}<select id="f-cat">${opt('all',t('all'),F.cat)}${Object.entries(I18N[L].kinds).map(([k,l])=>opt(k,l,F.cat)).join('')}</select></label>
+   <label for="f-ess">${t('maxEss')}<select id="f-ess">${[1,2,3,4,5].map(n=>opt(n,n,F.ess)).join('')}</select></label>
+   <label for="f-tag">${t('tag')}<select id="f-tag">${opt('all',t('any'),F.tag)}${Object.entries(I18N[L].tags).map(([k,l])=>opt(k,l,F.tag)).join('')}</select></label>
+   <span class="count" id="count"></span>`;
+  renderList();
+}
+function renderList(){
+  const r=filtered();
+  document.getElementById('count').textContent=`${r.length} ${t('results')}`;
+  document.getElementById('list').innerHTML=r.slice(0,LIMIT).map(itemHTML).join('')+`<p class="note" style="padding:10px 0">${t('libNote')}</p>`;
+  document.getElementById('more').hidden=r.length<=LIMIT;
+}
+const pickQ=q=>({id:q.id,name:q.name,type:q.qualityType,page:q.page,summary:q.summary});
+const pickC=c=>{const hl=hlType();const md=hl&&(c.modes||[]).find(m=>m.exalts.includes(hl));
+  return {id:c.id,name:c.name,source:c.source,category:c.category,cost:c.cost||null,step:c.step||null,page:c.page,summary:c.summary,mode:md?{name:md.name,summary:md.summary}:null}};
+const vl=document.getElementById('view-library');
+vl.addEventListener('input',ev=>{if(ev.target.id==='f-q'){F.q=ev.target.value;LIMIT=60;store.set('filters',F);renderList()}});
+vl.addEventListener('change',ev=>{const m={'f-src':'src','f-cat':'cat','f-ess':'ess','f-tag':'tag'}[ev.target.id];if(!m)return;F[m]=ev.target.value;LIMIT=60;store.set('filters',F);renderList()});
+vl.addEventListener('click',ev=>{
+  if(ev.target.id==='more'){LIMIT+=60;renderList();return}
+  const a=ev.target.closest('[data-add]');
+  if(a){const x=LIB.get(a.dataset.add),e=E();
+    if(x.category==='quality'){if(!e.qualities.some(y=>y.id===x.id))e.qualities.push(pickQ(x))}
+    else if(!e.charms.some(y=>y.id===x.id))e.charms.push(pickC(x));
+    a.disabled=true;a.textContent='✓';save();renderDock();toast(t('added')+' '+ename(e)+': '+x.name)}
+});
+
+/* ---------- enemies tab ---------- */
+let pendingDel=null;
+function renderBuilder(){
+  const e=E();
+  const n=(id,lab,val)=>`<label for="b-${id}">${lab}<input id="b-${id}" data-k="${id}" type="number" min="0" value="${val}"></label>`;
+  const pool=(k,lab)=>`<div class="field"><label for="b-${k}-a">${lab} — ${t('actions')}</label><input id="b-${k}-a" data-pool="${k}" value="${esc(e.pools[k].actions)}"></div>`;
+  document.getElementById('view-builder').innerHTML=`
+  <div class="grid2">
+   <div class="panel"><h2>${t('bTitle')}</h2>
+    <div class="field"><label for="b-name">${t('name')}</label><input id="b-name" data-s="name" value="${esc(e.name)}"></div>
+    <div class="field"><label for="b-concept">${t('concept')}</label><input id="b-concept" data-s="concept" value="${esc(e.concept)}"></div>
+    <div class="field"><label for="b-creature">${t('creature')}</label><select id="b-creature" data-s="creature">${CREATURES.map(c=>`<option value="${c}" ${e.creature===c?'selected':''}>${esc(creLabel(c))}</option>`).join('')}</select></div>
+    <div class="stats">${n('essence',t('essence'),e.essence)}${n('motes',t('motes'),e.motes)}${n('p',t('prim'),e.pools.primary.dice)}${n('s',t('sec'),e.pools.secondary.dice)}${n('t',t('ter'),e.pools.tertiary.dice)}${n('health',t('health'),e.health)}${n('defense',t('defense'),e.defense)}${n('soak',t('soak'),e.soak)}${n('hardness',t('hardness'),e.hardness)}${n('resolve',t('resolve'),e.resolve)}</div>
+    ${pool('primary',t('prim'))}${pool('secondary',t('sec'))}${pool('tertiary',t('ter'))}
+    <div class="field"><label for="b-weapon">${t('weapon')}</label><input id="b-weapon" data-s="weapon" value="${esc(e.weapon)}" placeholder="Daiklave +2/+2/2"></div>
+    <div class="field"><label for="b-notes">${t('notes')}</label><textarea id="b-notes" data-s="notes" rows="3">${esc(e.notes)}</textarea></div>
+   </div>
+   <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+    <div class="panel"><h3>${t('roster')}</h3><p class="note">${t('rosterLede')}</p>
+     <ul class="roster">${ROSTER.map(x=>`<li aria-current="${x.id===ACTIVE}"><span><b>${esc(ename(x))}</b><br><span class="small">${esc(creLabel(x.creature))} · Ess ${x.essence} · ${x.charms.length+x.qualities.length} ${t('charms').toLowerCase()}/${t('qualities').toLowerCase()}</span></span>
+      ${x.id===ACTIVE?`<span class="chip" style="--src:var(--accent)">${t('active')}</span>`:`<button class="btn" type="button" data-open="${x.id}">${t('open')}</button>`}
+      <button class="btn" type="button" data-dup="${x.id}">${t('dup')}</button>
+      ${ROSTER.length>1?`<button class="btn danger" type="button" data-del="${x.id}">${pendingDel===x.id?t('confirmDel'):t('del')}</button>`:''}</li>`).join('')}</ul>
+     <div class="row" style="margin-top:10px"><button class="btn primary" type="button" id="b-new">+ ${t('newE')}</button></div></div>
+    <div class="panel"><h3>${t('fTitle')}</h3><p class="note">${t('fLede')}</p><ol class="steps">${I18N[L].fSteps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+     <div class="row"><button class="btn primary" type="button" data-fx="macro">${t('foundryMacro')}</button><button class="btn" type="button" data-fx="json">${t('foundryJson')}</button><button class="btn" type="button" data-fx="enemy">${t('enemyJson')}</button><button class="btn" type="button" id="b-lib">${t('copyLib')}</button></div>
+     <p class="note" style="margin-top:10px">${t('ioLede')}</p>
+     <textarea class="io" id="b-io" aria-label="JSON"></textarea>
+     <div class="row" style="margin-top:8px"><button class="btn" type="button" id="b-import">${t('loadJ')}</button></div></div>
+   </div>
+  </div>`;
+}
+const vb=document.getElementById('view-builder');
+vb.addEventListener('input',ev=>{const el=ev.target,e=E();if(el.id==='b-io')return;
+  if(el.dataset.s){e[el.dataset.s]=el.value}
+  else if(el.dataset.pool){e.pools[el.dataset.pool].actions=el.value}
+  else if(el.dataset.k){const v=+el.value||0,k=el.dataset.k;if(k==='p')e.pools.primary.dice=v;else if(k==='s')e.pools.secondary.dice=v;else if(k==='t')e.pools.tertiary.dice=v;else e[k]=v}
+  else return;
+  save();renderDock();if(el.dataset.s==='name'||el.dataset.s==='creature')renderChrome()});
+vb.addEventListener('change',ev=>{if(ev.target.dataset.s==='creature'||ev.target.dataset.s==='name')renderBuilderKeepFocus()});
+function renderBuilderKeepFocus(){const id=document.activeElement&&document.activeElement.id;renderBuilder();const el=id&&document.getElementById(id);if(el&&el.focus)el.focus()}
+vb.addEventListener('click',ev=>{
+  const io=document.getElementById('b-io');
+  const f=ev.target.closest('[data-fx]');if(f){exportFx(f.dataset.fx);return}
+  if(ev.target.id==='b-lib'){copy(JSON.stringify(D),io);return}
+  if(ev.target.id==='b-new'){newEnemy();return}
+  const o=ev.target.closest('[data-open]');if(o){ACTIVE=o.dataset.open;pendingDel=null;save();renderAll();return}
+  const du=ev.target.closest('[data-dup]');if(du){const src=ROSTER.find(x=>x.id===du.dataset.dup);const n=newEnemy(src);n.name=(src.name||t('unnamed'))+' (2)';save();renderAll();return}
+  const de=ev.target.closest('[data-del]');if(de){const id=de.dataset.del;
+    if(pendingDel!==id){pendingDel=id;renderBuilder();return}
+    ROSTER=ROSTER.filter(x=>x.id!==id);pendingDel=null;if(ACTIVE===id)ACTIVE=ROSTER[0].id;save();renderAll();return}
+  if(ev.target.id==='b-import'){try{const o=JSON.parse(io.value);if(!o||!o.pools||!o.pools.primary)throw 0;const n=Object.assign(blank(),o,{id:uid()});ROSTER.push(n);ACTIVE=n.id;save();renderAll();toast(t('loaded'))}catch(err){toast(t('badJson'))}}
+});
+
+function renderAll(){renderChrome();renderDock();if(TAB==='templates')renderTemplates();if(TAB==='library')renderLibrary();if(TAB==='builder')renderBuilder()}
+renderAll();
+</script>
