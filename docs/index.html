@@ -154,6 +154,20 @@ body[data-dock="top"] .dock[data-min="1"] .dock-b,body[data-dock="bottom"] .dock
 .roster li{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line)}
 .roster li[aria-current="true"] b{color:var(--accent)}
 .roster li span{flex:1;min-width:0}
+.roster li>span.chip{flex:0 0 auto}
+.folder{border-bottom:1px solid var(--line)}
+.folder>summary{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 0;cursor:pointer;font-weight:600}
+.folder>summary .small{font-weight:400}
+.folder>summary .grow{flex:1;min-width:0}
+.folder .roster{margin:0 0 6px;padding-left:14px;border-left:2px solid var(--line)}
+.folder .roster li:last-child{border-bottom:0}
+.imp{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:8px}
+.imp label{display:flex;flex-direction:column;font-size:.8rem;color:var(--muted);flex:1;min-width:160px}
+.imp input[type=text]{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:.95rem}
+.bgbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:10px}
+.bgbox .chk{display:flex;gap:8px;align-items:center;font-weight:600;cursor:pointer}
+.bgbox .stats{margin-top:4px}
+.bgbox select{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:.95rem;text-transform:none;letter-spacing:0}
 .btn.danger{color:var(--warn);border-color:var(--warn)}
 .field select{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:.95rem;text-transform:none;letter-spacing:0}
 .steps{font-size:.88rem;color:var(--muted);padding-left:18px;margin:6px 0}
@@ -208,8 +222,11 @@ const I18N={
   edit:'Edit',foundryMacro:'Foundry macro',foundryJson:'Foundry JSON',enemyJson:'Enemy JSON',loadJ:'Load as new enemy',copyLib:'Copy full library JSON',
   fTitle:'Send to Foundry VTT',fLede:'Built for the Exalted Essence system 2.0.11 (Foundry 13). Creates an NPC with its stats, pools, weapon, qualities and Charms as items.',
   fSteps:['In Foundry, open Macros, create a new macro and set its type to Script.','Paste the macro copied here and run it. The NPC opens ready to use.','Alternative: save the Foundry JSON as a .json file, create an NPC, right-click it in the Actors tab and choose Import Data.'],
-  ioLede:'The box shows the last thing you copied. Paste an enemy JSON here and press Load as new enemy to bring it back.',
-  copied:'Copied to clipboard',copyFail:'Clipboard blocked. The text is selected in the box; copy it manually.',loaded:'Enemy loaded',badJson:'That text is not valid enemy JSON. Check that it starts with { and was copied completely.',
+  ioLede:'The box shows the last thing you copied. Paste one enemy JSON, a list [ ... ] of enemies or a folder JSON here and press Load, or import several .json files at once.',
+  copied:'Copied to clipboard',copyFail:'Clipboard blocked. The text is selected in the box; copy it manually.',loaded:'enemies loaded',badJson:'That text is not valid enemy JSON. Check that it starts with { or [ and was copied completely.',
+  folder:'Folder',noFolder:'No folder',impFolder:'Destination folder (optional, overrides the files’ folder)',impFiles:'Import .json files',
+  folderMacro:'Folder macro',folderJson:'Folder JSON',delFolder:'Delete folder',folderMacroNote:'The folder macro creates every NPC of the folder at once, inside an Actors folder with the same name.',
+  isBg:'Battle group',bgHealth:'Health by Size',bgFree:'Free qualities',bgFoundry:'In Foundry the sheet is marked as a battle group: the system adds Drill to attack, damage and Build Power and sets Overwhelming to Size + 1 (max 5). Do not add Drill to the pools by hand.',
   fromTpl:'Base',mode:'Mode',libNote:'Summaries are distilled from the book for antagonist use. Check the page reference for full rules.',cost:'Cost',step:'Step',
   dockPos:'Preview position',top:'Top',left:'Left',right:'Right',bottom:'Bottom',minimize:'Minimize',expand:'Expand'},
  pt:{sub:'Exalted: Essence',templates:'Templates',library:'Biblioteca',builder:'Inimigos',
@@ -228,8 +245,11 @@ const I18N={
   edit:'Editar',foundryMacro:'Macro do Foundry',foundryJson:'JSON do Foundry',enemyJson:'JSON do inimigo',loadJ:'Carregar como novo inimigo',copyLib:'Copiar JSON da biblioteca',
   fTitle:'Enviar para o Foundry VTT',fLede:'Feito para o sistema Exalted Essence 2.0.11 (Foundry 13). Cria um NPC com stats, pools, arma, qualidades e Charms como itens.',
   fSteps:['No Foundry, abra Macros, crie uma macro nova e mude o tipo para Script.','Cole a macro copiada aqui e execute. O NPC abre pronto para usar.','Alternativa: salve o JSON do Foundry como arquivo .json, crie um NPC, clique com o botão direito nele na aba Actors e escolha Import Data.'],
-  ioLede:'A caixa mostra o último texto copiado. Cole um JSON de inimigo aqui e clique em Carregar como novo inimigo para trazê-lo de volta.',
-  copied:'Copiado',copyFail:'Área de transferência bloqueada. O texto está selecionado na caixa; copie manualmente.',loaded:'Inimigo carregado',badJson:'Esse texto não é um JSON de inimigo válido. Confira se começa com { e se foi copiado inteiro.',
+  ioLede:'A caixa mostra o último texto copiado. Cole um JSON de inimigo, uma lista [ ... ] de inimigos ou o JSON de uma pasta e clique em Carregar, ou importe vários arquivos .json de uma vez.',
+  copied:'Copiado',copyFail:'Área de transferência bloqueada. O texto está selecionado na caixa; copie manualmente.',loaded:'inimigos carregados',badJson:'Esse texto não é um JSON de inimigo válido. Confira se começa com { ou [ e se foi copiado inteiro.',
+  folder:'Pasta',noFolder:'Sem pasta',impFolder:'Pasta de destino (opcional, substitui a pasta dos arquivos)',impFiles:'Importar arquivos .json',
+  folderMacro:'Macro da pasta',folderJson:'JSON da pasta',delFolder:'Excluir pasta',folderMacroNote:'A macro da pasta cria todos os NPCs dela de uma vez, dentro de uma pasta de Actors com o mesmo nome.',
+  isBg:'Grupo de batalha',bgHealth:'Vida pelo Size',bgFree:'Qualidades grátis',bgFoundry:'No Foundry a ficha sai marcada como grupo de batalha: o sistema soma o Drill em ataque, dano e Build Power e põe o Overwhelming em Size + 1 (máx. 5). Não some o Drill nas paradas à mão.',
   fromTpl:'Base',mode:'Modo',libNote:'Os resumos são destilados do livro para uso com antagonistas. Consulte a página para as regras completas.',cost:'Custo',step:'Step',
   dockPos:'Posição da prévia',top:'Acima',left:'Esquerda',right:'Direita',bottom:'Abaixo',minimize:'Minimizar',expand:'Expandir'}
 };
@@ -250,10 +270,26 @@ const MOTES_HI={6:17,7:20,8:20,9:22,10:27};
 const motesFor=E=>{E=Math.max(1,Math.round(+E||1));return E<=5?E*2+Math.floor((E-1)/2)+3:MOTES_HI[E]||27+(E-10)*3};
 const blank=()=>({id:uid(),system:'Exalted: Essence',name:'',concept:'',creature:'mortal',playerEssence:PE,tier:'standard',essence:1,motes:5,
   pools:{primary:{dice:8,actions:''},secondary:{dice:6,actions:''},tertiary:{dice:5,actions:''}},
-  health:5,defense:3,soak:2,hardness:3,resolve:3,weapon:'',qualities:[],charms:[],notes:''});
+  health:5,defense:3,soak:2,hardness:3,resolve:3,weapon:'',folder:'',battlegroup:false,size:1,drill:1,qualities:[],charms:[],notes:''});
+/* ---------- battle groups (p. 322-323) ---------- */
+const BGSIZE=s=>T.battleGroups.sizes[Math.max(0,Math.min(5,+s||0))];
+const BGDRILL=d=>T.battleGroups.drill[Math.max(0,Math.min(3,+d||0))];
+/* More of Us always; Formation Attack from regular, Opportunistic Threat from veteran, Deadly Ground at elite (p. 323); Ranked Assault at Size 2+ (p. 320) */
+function bgFree(e){if(!e.battlegroup)return[];const d=+e.drill||0,ids=['quality-more-of-us'];
+  if(d>=1)ids.push('quality-formation-attack');if(d>=2)ids.push('quality-opportunistic-threat');if(d>=3)ids.push('quality-deadly-ground');if(+e.size>=2)ids.push('quality-ranked-assault');
+  return ids.filter(id=>!e.qualities.some(q=>q.id===id)).map(id=>D.qualities.find(q=>q.id===id)).filter(Boolean)}
+const bgLine=e=>`${t('isBg')} · Size ${e.size} (${BGSIZE(e.size).fighters[L]}) · Drill ${BGDRILL(e.drill).drill} (+${BGDRILL(e.drill).bonus})`;
+/* older files: battle group quality plus "Size N" / "Drill X" in the notes */
+function inferBG(e){if(typeof e.battlegroup==='boolean')return e;const has=(e.qualities||[]).some(q=>q.id==='quality-battle-group');
+  e.battlegroup=has;const txt=(e.notes||'')+' '+(e.concept||''),s=txt.match(/Size\s*(\d)/i),d=txt.match(/Drill\s*(Poor|Regular|Veteran|Elite)/i);
+  e.size=s?+s[1]:1;e.drill=d?['poor','regular','veteran','elite'].indexOf(d[1].toLowerCase()):1;return e}
 let ROSTER=store.get('enemies',null);
 if(!Array.isArray(ROSTER)||!ROSTER.length){const old=store.get('enemy',null);ROSTER=[old?Object.assign(blank(),old,{id:uid()}):blank()]}
-ROSTER.forEach(e=>{if(!e.id)e.id=uid();if(!e.creature)e.creature='other'});
+ROSTER.forEach(e=>{if(!e.id)e.id=uid();if(!e.creature)e.creature='other';if(typeof e.folder!=='string')e.folder='';inferBG(e)});
+let OPENF=new Set(store.get('closedFolders',[]));
+/* folders in roster order, unfiled last */
+const folders=()=>{const s=[...new Set(ROSTER.map(e=>e.folder).filter(Boolean))];return ROSTER.some(e=>!e.folder)?[...s,'']:s};
+const inFolder=f=>ROSTER.filter(e=>e.folder===f);
 let ACTIVE=store.get('active',ROSTER[0].id); if(!ROSTER.some(e=>e.id===ACTIVE))ACTIVE=ROSTER[0].id;
 const E=()=>ROSTER.find(e=>e.id===ACTIVE);
 let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(()=>{store.set('enemies',ROSTER);store.set('active',ACTIVE)},150)}
@@ -278,7 +314,8 @@ function toFoundry(e){
   const w=(e.weapon||'').match(/([+-]?\d+)\s*\/\s*([+-]?\d+)\s*\/\s*(\d+)/);
   const wn=e.weapon.replace(/\s*[+-]?\d+\s*\/.*$/,'').trim(),wl=L==='pt'?'Arma':'Weapon',wname=!wn?wl:/^(natural |heavy |mundane )?artifact$|^(mundane|heavy|medium|light)$/i.test(wn)?`${wl} (${wn})`:wn;
   if(w)items.push({name:wname,type:'weapon',system:{description:'',pagenum:'',accuracy:+w[1],damage:+w[2],defence:0,defense:0,overwhelming:+w[3],equipped:true,weapontype:/ranged|bow|wand|bolt/i.test(e.weapon)?'ranged':'melee',attackeffectpreset:'none',attackeffect:'',weight:/heavy|pesad/i.test(e.weapon)?'heavy':'medium',traits:{weapontags:{value:[],custom:''}}}});
-  e.qualities.forEach(q=>items.push({name:q.name,type:'quality',system:{description:fDesc(q),pagenum:'p. '+q.page,...act,cost:fCost((q.summary.en.match(/(commit )?\d+m\b/i)||[''])[0].toLowerCase()),gain:{...gain}}}));
+  const quals=[...e.qualities,...bgFree(e).map(pickQ)];
+  quals.forEach(q=>items.push({name:q.name,type:'quality',system:{description:fDesc(q),pagenum:'p. '+q.page,...act,cost:fCost((q.summary.en.match(/(commit )?\d+m\b/i)||[''])[0].toLowerCase()),gain:{...gain}}}));
   e.charms.forEach(c=>{const r=LIB.get(c.id)||{};
     if(r.category==='spell'){items.push({name:c.name,type:'spell',system:{description:fDesc(c,r),pagenum:'p. '+c.page,...act,circle:['','first','second','third'][r.circle||1],cost:+((c.cost||'').match(/\d+/)||[0])[0],spelltype:r.school||'universal'}});return}
     const req=+(((r.prerequisites||'').match(/[A-Za-z)]\s(\d)/)||[])[1]||0);
@@ -297,14 +334,23 @@ function toFoundry(e){
     hardness:{min:0,value:+e.hardness||0},resolve:{min:0,value:+e.resolve||0},
     health:{value:+e.health||1,min:0,max:+e.health||1,levels:+e.health||1,lethal:0,aggravated:0,penalty:0},
     pools:{primary:{value:+e.pools.primary.dice||0,actions:e.pools.primary.actions},secondary:{value:+e.pools.secondary.dice||0,actions:e.pools.secondary.actions},tertiary:{value:+e.pools.tertiary.dice||0,actions:e.pools.tertiary.actions}},
-    qualities:e.qualities.map(q=>q.name).join(', '),
-    biography:`<p>${esc(e.concept)}</p>${e.notes?`<p>${esc(e.notes).replace(/\n/g,'<br>')}</p>`:''}<p><b>Motes:</b> ${+e.motes||0}</p><p><em>Essence Antagonist Forge${T.tiers[e.tier]?` · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier][L])}`:''}</em></p>`
+    qualities:quals.map(q=>q.name).join(', '),
+    battlegroup:!!e.battlegroup,commandbonus:{min:0,value:0},size:{min:0,value:e.battlegroup?+e.size||0:0},drill:{min:0,value:e.battlegroup?+e.drill||0:0},
+    biography:`<p>${esc(e.concept)}</p>${e.battlegroup?`<p><b>${esc(bgLine(e))}</b> · ${esc(t('rout'))}: ${esc(BGDRILL(e.drill).rout[L])}</p>`:''}${e.notes?`<p>${esc(e.notes).replace(/\n/g,'<br>')}</p>`:''}<p><b>Motes:</b> ${+e.motes||0}</p><p><em>Essence Antagonist Forge${T.tiers[e.tier]?` · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier][L])}`:''}</em></p>`
   };
   return {name:ename(e),type:'npc',img:'icons/svg/mystery-man.svg',system:sys,items,effects:[],flags:{'essence-antagonist-forge':{sourceId:e.id}},
     _stats:{systemId:'exaltedessence',systemVersion:'2.0.11',coreVersion:'13.345'}};
 }
-function toMacro(e){const d=toFoundry(e);delete d._stats;
-  return `// Essence Antagonist Forge -> Exalted Essence 2.0.11\n// ${d.name}\nconst data = ${JSON.stringify(d,null,1)};\nconst actor = await Actor.implementation.create(data);\nif (actor) { ui.notifications.info(\`\${actor.name} criado / created\`); actor.sheet.render(true); }\n`}
+/* one macro for any number of NPCs; with a folder name it creates (or reuses) that Actors folder */
+function toMacro(list,folder){list=[].concat(list);const ds=list.map(e=>{const d=toFoundry(e);delete d._stats;return d});
+  if(folder===undefined)folder=list.length===1?list[0].folder||'':'';
+  const line=s=>String(s).replace(/\s+/g,' ');
+  return `// Essence Antagonist Forge -> Exalted Essence 2.0.11\n// ${folder?line(folder)+': ':''}${ds.map(d=>line(d.name)).join(', ')}\n`+
+    `const folderName = ${JSON.stringify(folder)};\nconst data = ${JSON.stringify(ds,null,1)};\n`+
+    `if (folderName) {\n  const folder = game.folders.find(f => f.type === 'Actor' && f.name === folderName) ?? await Folder.create({ name: folderName, type: 'Actor' });\n  data.forEach(d => d.folder = folder.id);\n}\n`+
+    `const actors = await Actor.implementation.createDocuments(data);\n`+
+    `ui.notifications.info(\`\${actors.length} NPC(s) criado(s) / created\${folderName ? ': ' + folderName : ''}\`);\n`+
+    `if (actors.length === 1) actors[0].sheet.render(true);\n`}
 
 /* ---------- chrome ---------- */
 function renderChrome(){
@@ -338,7 +384,7 @@ function renderDock(){
   const pb=(k,ic,cls='')=>`<button type="button" class="${cls}" data-pos="${k}" aria-pressed="${DOCK===k}" title="${t(k)}" aria-label="${t('dockPos')}: ${t(k)}">${ic}</button>`;
   const pools=['primary','secondary','tertiary'].filter(k=>e.pools[k].actions).map(k=>`<div class="small"><b>${t({primary:'prim',secondary:'sec',tertiary:'ter'}[k])} ${e.pools[k].dice}:</b> ${esc(e.pools[k].actions)}</div>`).join('');
   d.innerHTML=`<div class="dock-h">
-    <select id="dock-sel" aria-label="${t('roster')}">${ROSTER.map(x=>`<option value="${x.id}" ${x.id===ACTIVE?'selected':''}>${esc(ename(x))}</option>`).join('')}</select>
+    <select id="dock-sel" aria-label="${t('roster')}">${folders().map(f=>{const o=inFolder(f).map(x=>`<option value="${x.id}" ${x.id===ACTIVE?'selected':''}>${esc(ename(x))}</option>`).join('');return folders().length>1||f?`<optgroup label="${esc(f||t('noFolder'))}">${o}</optgroup>`:o}).join('')}</select>
     <button class="ib" type="button" id="dock-new" title="${t('newE')}" aria-label="${t('newE')}">+</button>
     <div class="pos" role="group" aria-label="${t('dockPos')}">${pb('top','↑')}${pb('left','←','pos-side')}${pb('right','→','pos-side')}${pb('bottom','↓')}</div>
     <button class="ib" type="button" id="dock-min" aria-label="${DMIN?t('expand'):t('minimize')}" title="${DMIN?t('expand'):t('minimize')}">${DMIN?'▢':'–'}</button>
@@ -346,6 +392,7 @@ function renderDock(){
   <div class="dock-b"><div>
     <h3>${esc(ename(e))}</h3><div class="small">${esc(creLabel(e.creature))}${T.tiers[e.tier]?` · ${t('fromTpl')}: ${t('essence')} ${e.playerEssence} · ${esc(T.tiers[e.tier][L])}`:''}</div>
     ${e.concept?`<div class="small">${esc(e.concept)}</div>`:''}
+    ${e.battlegroup?`<div class="small" style="margin-top:4px"><b>${esc(bgLine(e))}</b><br>${t('rout')}: ${esc(BGDRILL(e.drill).rout[L])}${bgFree(e).length?`<br>${t('bgFree')}: ${esc(bgFree(e).map(q=>q.name).join(', '))}`:''}</div>`:''}
     ${statline(e)}${pools}${e.weapon?`<div class="small"><b>${t('weapon')}:</b> ${esc(e.weapon)}</div>`:''}
     <div class="dock-actions"><button class="btn" type="button" data-go="builder">${t('edit')}</button><button class="btn primary" type="button" data-fx="macro">${t('foundryMacro')}</button><button class="btn" type="button" data-fx="json">${t('foundryJson')}</button></div>
    </div><div><div class="label" style="margin-top:6px">${t('picked')} (${e.charms.length+e.qualities.length})</div>${pickedHTML(e)}</div></div>`;
@@ -363,7 +410,17 @@ dockEl.addEventListener('click',ev=>{
 function exportFx(kind,e=E()){const ta=document.getElementById('b-io');
   const s=kind==='macro'?toMacro(e):kind==='json'?JSON.stringify(toFoundry(e),null,2):JSON.stringify(e,null,2);copy(s,ta)}
 function rm(k){const e=E(),[t2,id]=k.split(/:(.+)/);if(t2==='q')e.qualities=e.qualities.filter(x=>x.id!==id);else e.charms=e.charms.filter(x=>x.id!==id);save();renderDock();if(TAB==='builder')renderBuilder();if(TAB==='library')renderList()}
-function newEnemy(base){const n=base?Object.assign(JSON.parse(JSON.stringify(base)),{id:uid()}):blank();ROSTER.push(n);ACTIVE=n.id;save();renderAll();return n}
+function newEnemy(base){const n=base?Object.assign(JSON.parse(JSON.stringify(base)),{id:uid()}):Object.assign(blank(),{folder:E().folder||''});ROSTER.push(n);ACTIVE=n.id;save();renderAll();return n}
+/* accepts one enemy, a list of enemies, or {folder, enemies:[...]} */
+function parseEnemies(text){const o=JSON.parse(text);
+  const list=Array.isArray(o)?o:o&&Array.isArray(o.enemies)?o.enemies.map(x=>Object.assign({folder:o.folder||''},x)):[o];
+  return list.filter(x=>x&&x.pools&&x.pools.primary)}
+const pristine=e=>!e.name&&!e.concept&&!e.notes&&!e.charms.length&&!e.qualities.length;
+function importEnemies(list,folder){if(!list.length)throw 0;
+  const added=list.map(o=>{o=inferBG({...o});const b=blank(),n=Object.assign(b,o,{id:uid()});
+    n.pools=Object.assign(b.pools,o.pools);n.qualities=o.qualities||[];n.charms=o.charms||[];n.folder=folder||(typeof o.folder==='string'?o.folder:'');return n});
+  if(ROSTER.length===1&&pristine(ROSTER[0]))ROSTER=[];
+  ROSTER.push(...added);ACTIVE=added[0].id;save();renderAll();toast(`${added.length} ${t('loaded')}`)}
 
 /* ---------- templates ---------- */
 function renderTemplates(){
@@ -495,6 +552,13 @@ function renderBuilder(){
     <div class="field"><label for="b-name">${t('name')}</label><input id="b-name" data-s="name" value="${esc(e.name)}"></div>
     <div class="field"><label for="b-concept">${t('concept')}</label><input id="b-concept" data-s="concept" value="${esc(e.concept)}"></div>
     <div class="field"><label for="b-creature">${t('creature')}</label><select id="b-creature" data-s="creature">${CREATURES.map(c=>`<option value="${c}" ${e.creature===c?'selected':''}>${esc(creLabel(c))}</option>`).join('')}</select></div>
+    <div class="field"><label for="b-folder">${t('folder')}</label><input id="b-folder" data-s="folder" list="b-folders" value="${esc(e.folder)}"><datalist id="b-folders">${folders().filter(Boolean).map(f=>`<option value="${esc(f)}">`).join('')}</datalist></div>
+    <div class="bgbox"><label class="chk" for="b-bg"><input type="checkbox" id="b-bg" ${e.battlegroup?'checked':''}> ${t('isBg')}</label>
+     ${e.battlegroup?`<div class="stats">
+      <label for="b-size">Size<select id="b-size">${T.battleGroups.sizes.map(s=>`<option value="${s.size}" ${+e.size===s.size?'selected':''}>${s.size} · ${esc(s.fighters[L])}</option>`).join('')}</select></label>
+      <label for="b-drill">Drill<select id="b-drill">${T.battleGroups.drill.map((d,i)=>`<option value="${i}" ${+e.drill===i?'selected':''}>${d.drill} (+${d.bonus})</option>`).join('')}</select></label></div>
+      <p class="note">${t('bgHealth')}: <b>${BGSIZE(e.size).health}</b> · ${t('ovw')}: <b>${BGSIZE(e.size).overwhelming}</b> · ${t('rout')}: ${esc(BGDRILL(e.drill).rout[L])}${bgFree(e).length?`<br>${t('bgFree')}: ${esc(bgFree(e).map(q=>q.name).join(', '))}`:''}</p>
+      <p class="note">${t('bgFoundry')}</p>`:''}</div>
     <div class="stats">${n('essence',t('essence'),e.essence)}${n('motes',t('motes'),e.motes)}${n('p',t('prim'),e.pools.primary.dice)}${n('s',t('sec'),e.pools.secondary.dice)}${n('t',t('ter'),e.pools.tertiary.dice)}${n('health',t('health'),e.health)}${n('defense',t('defense'),e.defense)}${n('soak',t('soak'),e.soak)}${n('hardness',t('hardness'),e.hardness)}${n('resolve',t('resolve'),e.resolve)}</div>
     ${pool('primary',t('prim'))}${pool('secondary',t('sec'))}${pool('tertiary',t('ter'))}
     <div class="field"><label for="b-weapon">${t('weapon')}</label><input id="b-weapon" data-s="weapon" value="${esc(e.weapon)}" placeholder="Daiklave +2/+2/2"></div>
@@ -502,19 +566,27 @@ function renderBuilder(){
    </div>
    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
     <div class="panel"><h3>${t('roster')}</h3><p class="note">${t('rosterLede')}</p>
-     <ul class="roster">${ROSTER.map(x=>`<li aria-current="${x.id===ACTIVE}"><span><b>${esc(ename(x))}</b><br><span class="small">${esc(creLabel(x.creature))} · Ess ${x.essence} · ${x.charms.length+x.qualities.length} ${t('charms').toLowerCase()}/${t('qualities').toLowerCase()}</span></span>
-      ${x.id===ACTIVE?`<span class="chip" style="--src:var(--accent)">${t('active')}</span>`:`<button class="btn" type="button" data-open="${x.id}">${t('open')}</button>`}
-      <button class="btn" type="button" data-dup="${x.id}">${t('dup')}</button>
-      ${ROSTER.length>1?`<button class="btn danger" type="button" data-del="${x.id}">${pendingDel===x.id?t('confirmDel'):t('del')}</button>`:''}</li>`).join('')}</ul>
+     ${folders().map((f,i)=>{const xs=inFolder(f),fk=f||'\u0000';
+      return `<details class="folder" data-fold="${i}" ${OPENF.has(fk)?'':'open'}><summary><span class="grow">${esc(f||t('noFolder'))} <span class="small">(${xs.length})</span></span>
+       <button class="btn" type="button" data-fmacro="${i}">${t('folderMacro')}</button><button class="btn" type="button" data-fjson="${i}">${t('folderJson')}</button>
+       ${f&&xs.length<ROSTER.length?`<button class="btn danger" type="button" data-fdel="${i}">${pendingDel==='folder:'+f?t('confirmDel'):t('delFolder')}</button>`:''}</summary>
+      <ul class="roster">${xs.map(rosterItem).join('')}</ul></details>`}).join('')}
+     <p class="note" style="margin-top:8px">${t('folderMacroNote')}</p>
      <div class="row" style="margin-top:10px"><button class="btn primary" type="button" id="b-new">+ ${t('newE')}</button></div></div>
     <div class="panel"><h3>${t('fTitle')}</h3><p class="note">${t('fLede')}</p><ol class="steps">${I18N[L].fSteps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
      <div class="row"><button class="btn primary" type="button" data-fx="macro">${t('foundryMacro')}</button><button class="btn" type="button" data-fx="json">${t('foundryJson')}</button><button class="btn" type="button" data-fx="enemy">${t('enemyJson')}</button><button class="btn" type="button" id="b-lib">${t('copyLib')}</button></div>
      <p class="note" style="margin-top:10px">${t('ioLede')}</p>
      <textarea class="io" id="b-io" aria-label="JSON"></textarea>
-     <div class="row" style="margin-top:8px"><button class="btn" type="button" id="b-import">${t('loadJ')}</button></div></div>
+     <div class="imp"><label for="b-impf">${t('impFolder')}<input type="text" id="b-impf" list="b-folders"></label>
+      <button class="btn" type="button" id="b-import">${t('loadJ')}</button>
+      <button class="btn primary" type="button" id="b-files">${t('impFiles')}</button><input type="file" id="b-file" accept=".json,application/json" multiple hidden></div></div>
    </div>
   </div>`;
 }
+const rosterItem=x=>`<li aria-current="${x.id===ACTIVE}"><span><b>${esc(ename(x))}</b><br><span class="small">${esc(creLabel(x.creature))}${x.battlegroup?` · ${t('isBg')} Size ${x.size} / Drill ${esc(BGDRILL(x.drill).drill)}`:''} · Ess ${x.essence} · ${x.pools.primary.dice}/${x.pools.secondary.dice}/${x.pools.tertiary.dice} · HL ${x.health} · Def ${x.defense} · Soak ${x.soak} · Hard ${x.hardness} · ${x.charms.length+x.qualities.length} ${t('charms').toLowerCase()}/${t('qualities').toLowerCase()}</span></span>
+      ${x.id===ACTIVE?`<span class="chip" style="--src:var(--accent)">${t('active')}</span>`:`<button class="btn" type="button" data-open="${x.id}">${t('open')}</button>`}
+      <button class="btn" type="button" data-dup="${x.id}">${t('dup')}</button>
+      ${ROSTER.length>1?`<button class="btn danger" type="button" data-del="${x.id}">${pendingDel===x.id?t('confirmDel'):t('del')}</button>`:''}</li>`;
 const vb=document.getElementById('view-builder');
 vb.addEventListener('input',ev=>{const el=ev.target,e=E();if(el.id==='b-io')return;
   if(el.dataset.s){e[el.dataset.s]=el.value}
@@ -523,7 +595,18 @@ vb.addEventListener('input',ev=>{const el=ev.target,e=E();if(el.id==='b-io')retu
     if(k==='essence'&&el.value!==''){e.motes=motesFor(v);const mi=document.getElementById('b-motes');if(mi)mi.value=e.motes}}
   else return;
   save();renderDock();if(el.dataset.s==='name'||el.dataset.s==='creature')renderChrome()});
-vb.addEventListener('change',ev=>{if(ev.target.dataset.s==='creature'||ev.target.dataset.s==='name')renderBuilderKeepFocus()});
+vb.addEventListener('change',ev=>{const s=ev.target.dataset.s,id=ev.target.id,e=E();
+  /* turning a group on, or resizing it, sets Health from the Size table */
+  if(id==='b-bg'||id==='b-size'||id==='b-drill'){
+    if(id==='b-bg'){e.battlegroup=ev.target.checked;if(e.battlegroup){e.health=BGSIZE(e.size).health;const q=D.qualities.find(x=>x.id==='quality-battle-group');if(q&&!e.qualities.some(x=>x.id===q.id))e.qualities.push(pickQ(q))}
+      else e.qualities=e.qualities.filter(x=>x.id!=='quality-battle-group')}
+    if(id==='b-size'){e.size=+ev.target.value;e.health=BGSIZE(e.size).health}
+    if(id==='b-drill')e.drill=+ev.target.value;
+    save();renderDock();renderBuilderKeepFocus();return}if(s==='folder')E().folder=ev.target.value.trim();if(s==='creature'||s==='name'||s==='folder'){save();renderDock();renderBuilderKeepFocus()}
+  if(ev.target.id==='b-file'){const fs=[...ev.target.files],dest=document.getElementById('b-impf').value.trim();
+    Promise.all(fs.map(f=>f.text().then(parseEnemies).catch(()=>[]))).then(ls=>{try{importEnemies(ls.flat(),dest)}catch(err){toast(t('badJson'))}});ev.target.value=''}});
+vb.addEventListener('toggle',ev=>{const d=ev.target;if(!d.classList||!d.classList.contains('folder'))return;const fk=folders()[+d.dataset.fold]||'\u0000';
+  if(d.open)OPENF.delete(fk);else OPENF.add(fk);store.set('closedFolders',[...OPENF])},true);
 function renderBuilderKeepFocus(){const id=document.activeElement&&document.activeElement.id;renderBuilder();const el=id&&document.getElementById(id);if(el&&el.focus)el.focus()}
 vb.addEventListener('click',ev=>{
   const io=document.getElementById('b-io');
@@ -535,7 +618,14 @@ vb.addEventListener('click',ev=>{
   const de=ev.target.closest('[data-del]');if(de){const id=de.dataset.del;
     if(pendingDel!==id){pendingDel=id;renderBuilder();return}
     ROSTER=ROSTER.filter(x=>x.id!==id);pendingDel=null;if(ACTIVE===id)ACTIVE=ROSTER[0].id;save();renderAll();return}
-  if(ev.target.id==='b-import'){try{const o=JSON.parse(io.value);if(!o||!o.pools||!o.pools.primary)throw 0;const n=Object.assign(blank(),o,{id:uid()});ROSTER.push(n);ACTIVE=n.id;save();renderAll();toast(t('loaded'))}catch(err){toast(t('badJson'))}}
+  const fi=ev.target.closest('[data-fmacro],[data-fjson],[data-fdel]');
+  if(fi){ev.preventDefault();const f=folders()[+(fi.dataset.fmacro??fi.dataset.fjson??fi.dataset.fdel)],xs=inFolder(f);
+    if(fi.dataset.fmacro!==undefined){copy(toMacro(xs,f),io);return}
+    if(fi.dataset.fjson!==undefined){copy(JSON.stringify({folder:f,enemies:xs.map(({id,...x})=>x)},null,2),io);return}
+    if(pendingDel!=='folder:'+f){pendingDel='folder:'+f;renderBuilder();return}
+    ROSTER=ROSTER.filter(x=>x.folder!==f);pendingDel=null;if(!ROSTER.some(x=>x.id===ACTIVE))ACTIVE=ROSTER[0].id;save();renderAll();return}
+  if(ev.target.id==='b-files'){document.getElementById('b-file').click();return}
+  if(ev.target.id==='b-import'){try{importEnemies(parseEnemies(io.value),document.getElementById('b-impf').value.trim())}catch(err){toast(t('badJson'))}}
 });
 
 function renderAll(){renderChrome();renderDock();if(TAB==='templates')renderTemplates();if(TAB==='library')renderLibrary();if(TAB==='builder')renderBuilder()}

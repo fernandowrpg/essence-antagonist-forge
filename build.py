@@ -31,8 +31,9 @@ def main():
     split = body.index("</style>") + len("</style>")
     html = HEAD + body[:split] + "\n</head>\n<body>\n" + body[split:] + "\n</body>\n</html>\n"
     OUT.mkdir(exist_ok=True)
-    (OUT / "index.html").write_text(html, encoding="utf-8")
-    (OUT / "library.json").write_text(json.dumps(lib, ensure_ascii=False, indent=1), encoding="utf-8")
+    # newline="\n" keeps LF output when building on Windows
+    (OUT / "index.html").write_text(html, encoding="utf-8", newline="\n")
+    (OUT / "library.json").write_text(json.dumps(lib, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n")
     (OUT / ".nojekyll").write_text("", encoding="utf-8")
     c = lib["meta"]["counts"]
     print(f"docs/index.html  {len(html)//1024} KB  ({c['charms']} charms, {c['modes']} modes, {c['qualities']} qualities)")
