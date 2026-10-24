@@ -42,9 +42,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 nav{display:flex;gap:4px;flex-wrap:wrap}
 .tab{border:1px solid transparent;background:none;padding:6px 12px;border-radius:6px;cursor:pointer;color:var(--muted)}
 .tab[aria-selected="true"]{color:var(--fg);background:var(--sunk);border-color:var(--line)}
-.lang{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
-.lang button{border:0;background:none;padding:5px 10px;cursor:pointer;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
-.lang button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.lang,.theme{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.lang button,.theme button{border:0;background:none;padding:5px 10px;cursor:pointer;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.lang button[aria-pressed="true"],.theme button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 main{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:20px 60px}
 h2{font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0 0 4px;text-wrap:balance}
 h3{font-family:var(--display);font-weight:400;font-size:1.15rem;margin:0;text-wrap:balance}
@@ -175,6 +175,11 @@ body[data-dock="top"] .dock[data-min="1"] .dock-b,body[data-dock="bottom"] .dock
     <button type="button" id="lang-en" data-lang="en">EN</button>
     <button type="button" id="lang-pt" data-lang="pt">PT</button>
   </div>
+  <div class="theme" role="group" id="theme">
+    <button type="button" data-theme="auto">◐</button>
+    <button type="button" data-theme="light">☀</button>
+    <button type="button" data-theme="dark">☾</button>
+  </div>
  </div></div>
  <div id="dock-top-slot"></div>
 </div>
@@ -197,7 +202,7 @@ const EXALTS=['solar','lunar','abyssal','dragon-blooded','sidereal','infernal','
 const CREATURES=['mortal',...EXALTS,'god','demon','elemental','undead','fae','behemoth','animal','construct','magiccreature','exalt','other'];
 const CRE_LABEL={en:{mortal:'Mortal',god:'God',demon:'Demon',elemental:'Elemental',undead:'Undead / ghost',fae:'Fair Folk',behemoth:'Behemoth',animal:'Animal',construct:'Construct',magiccreature:'Magical creature',exalt:'Exalt (other)',other:'Other'},pt:{mortal:'Mortal',god:'Deus',demon:'Demônio',elemental:'Elemental',undead:'Morto-vivo / fantasma',fae:'Fair Folk',behemoth:'Behemoth',animal:'Animal',construct:'Constructo',magiccreature:'Criatura mágica',exalt:'Exaltado (outro)',other:'Outro'}};
 const I18N={
- en:{sub:'Exalted: Essence',templates:'Templates',library:'Library',builder:'Enemies',
+ en:{sub:'Exalted: Essence',theme:'Theme',themeAuto:'System',themeLight:'Light',themeDark:'Dark',templates:'Templates',library:'Library',builder:'Enemies',
   tplTitle:'Stat templates by Circle Essence',tplLede:'Pick the Essence of the players’ Circle. Each row is a starting point for an antagonist of that tier; tune any value by up to ±3.',
   pc:'Your Circle at this Essence',motes:'Motes',hardness:'Hardness',health:'Health',soak:'Soak',defense:'Defense',resolve:'Resolve',essence:'Essence',pools:'Pools (P/S/T)',charms:'Charms',qualities:'Qualities',weapon:'Weapon (acc/dmg/ovw)',use:'Use on active enemy',
   bg:'Battle groups',bgSize:'Size',fighters:'Fighters',ovw:'Overwhelming',drill:'Drill',bonus:'Bonus',freeQ:'Free quality',rout:'Rout check when',official:'Official stat blocks',type:'Type',page:'p.',rules:'Rules behind these numbers',
@@ -220,7 +225,7 @@ const I18N={
   isBg:'Battle group',bgHealth:'Health by Size',bgFree:'Free qualities',bgFoundry:'In Foundry the sheet is marked as a battle group: the system adds Drill to attack, damage and Build Power and sets Overwhelming to Size + 1 (max 5). Do not add Drill to the pools by hand.',
   fromTpl:'Base',mode:'Mode',libNote:'Summaries are distilled from the book for antagonist use. Check the page reference for full rules.',cost:'Cost',step:'Step',
   dockPos:'Preview position',top:'Top',left:'Left',right:'Right',bottom:'Bottom',minimize:'Minimize',expand:'Expand'},
- pt:{sub:'Exalted: Essence',templates:'Templates',library:'Biblioteca',builder:'Inimigos',
+ pt:{sub:'Exalted: Essence',theme:'Tema',themeAuto:'Sistema',themeLight:'Claro',themeDark:'Escuro',templates:'Templates',library:'Biblioteca',builder:'Inimigos',
   tplTitle:'Templates de stats por Essence do Círculo',tplLede:'Escolha a Essence do Círculo dos jogadores. Cada linha é um ponto de partida para um antagonista daquele nível; ajuste qualquer valor em até ±3.',
   pc:'Seu Círculo nesta Essence',motes:'Motes',hardness:'Hardness',health:'Health',soak:'Soak',defense:'Defense',resolve:'Resolve',essence:'Essence',pools:'Pools (P/S/T)',charms:'Charms',qualities:'Qualidades',weapon:'Arma (acerto/dano/ovw)',use:'Aplicar no inimigo ativo',
   bg:'Grupos de batalha',bgSize:'Size',fighters:'Combatentes',ovw:'Overwhelming',drill:'Drill',bonus:'Bônus',freeQ:'Qualidade grátis',rout:'Teste de debandada quando',official:'Blocos oficiais',type:'Tipo',page:'p.',rules:'Regras por trás destes números',
@@ -245,6 +250,9 @@ const I18N={
   dockPos:'Posição da prévia',top:'Acima',left:'Esquerda',right:'Direita',bottom:'Abaixo',minimize:'Minimizar',expand:'Expandir'}
 };
 const store={get(k,d){try{const v=localStorage.getItem('eaf.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('eaf.'+k,JSON.stringify(v))}catch(e){}}};
+let THEME=store.get('theme','auto');
+const applyTheme=()=>{if(THEME==='auto')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=THEME};
+applyTheme();
 let L=store.get('lang','en'), TAB=store.get('tab','templates'), PE=store.get('pe',1);
 let DOCK=store.get('dock','right'), DMIN=store.get('dmin',false);
 let F=Object.assign({q:'',src:'all',cat:'all',ess:'10',tag:'all',book:'all'},store.get('filters',{}));
@@ -349,6 +357,8 @@ function renderChrome(){
   document.body.dataset.dock=DOCK;
   document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
   document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===L));
+  document.getElementById('theme').setAttribute('aria-label',t('theme'));
+  document.querySelectorAll('.theme button').forEach(b=>{const n=t('theme'+b.dataset.theme[0].toUpperCase()+b.dataset.theme.slice(1));b.title=n;b.setAttribute('aria-label',`${t('theme')}: ${n}`);b.setAttribute('aria-pressed',b.dataset.theme===THEME)});
   document.getElementById('tabs').innerHTML=['templates','library','builder'].map(k=>`<button class="tab" role="tab" id="tab-${k}" aria-selected="${TAB===k}" data-tab="${k}">${t(k)}${k==='builder'?` <span class="num">(${ROSTER.length})</span>`:''}</button>`).join('');
   ['templates','library','builder'].forEach(k=>document.getElementById('view-'+k).hidden=TAB!==k);
   const dock=document.getElementById('dock'),slot=document.getElementById('dock-top-slot');
@@ -357,6 +367,7 @@ function renderChrome(){
 function goTab(k){TAB=k;store.set('tab',TAB);renderAll()}
 document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)goTab(b.dataset.tab)});
 document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>{L=b.dataset.lang;store.set('lang',L);renderAll()}));
+document.querySelectorAll('.theme button').forEach(b=>b.addEventListener('click',()=>{THEME=b.dataset.theme;store.set('theme',THEME);applyTheme();renderChrome()}));
 const head=document.getElementById('head');
 new ResizeObserver(()=>document.documentElement.style.setProperty('--headh',head.offsetHeight+'px')).observe(head);
 
